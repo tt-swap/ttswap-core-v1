@@ -211,7 +211,11 @@ contract TTSwap_Token is ERC20Permit, I_TTS {
      * @notice Will only set the referral if the user doesn't already have one
      */
     function addreferral(address user, address referral) external override {
-        if (auths[msg.sender] == 1 && referrals[user] == address(0)) {
+        if (
+            auths[msg.sender] == 1 &&
+            referrals[user] == address(0) &&
+            user != referral
+        ) {
             referrals[user] = referral;
             emit e_addreferral(user, referral);
         }
