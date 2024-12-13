@@ -5,7 +5,6 @@ import {I_TTSwap_Market, S_ProofState, S_GoodState, S_ProofKey, S_GoodKey, S_Goo
 import {I_TTSwap_LimitOrderTaker, S_takeGoodInputPrams} from "./interfaces/I_TTSwap_LimitOrderTaker.sol";
 import {L_Good, L_GoodIdLibrary} from "./libraries/L_Good.sol";
 import {L_TakeLimitPriceOrder} from "./libraries/L_TakeLimitPriceOrder.sol";
-import {L_Lock} from "./libraries/L_Lock.sol";
 import {L_Proof, L_ProofIdLibrary, L_ProofKeyLibrary} from "./libraries/L_Proof.sol";
 import {L_GoodConfigLibrary} from "./libraries/L_GoodConfig.sol";
 import {L_UserConfigLibrary} from "./libraries/L_UserConfig.sol";
@@ -57,6 +56,7 @@ contract TTSwap_Market is
     bytes32 private constant RETURN_VALUE =
         keccak256("ERC3156FlashBorrower.onFlashLoan");
     uint256 public override marketconfig;
+    uint256 private lock = 1;
 
     mapping(address goodid => S_GoodState) private goods;
     mapping(uint256 proofkey => uint256 proofid) public override proofmapping;
@@ -133,10 +133,10 @@ contract TTSwap_Market is
         return true;
     }
     modifier noReentrant() {
-        require(L_Lock.get() == address(0));
-        L_Lock.set(msg.sender);
+        require(lock == 1);
+        lock == 2;
         _;
-        L_Lock.set(address(0));
+        lock == 1;
     }
     /**
      * @dev Initializes a meta good
