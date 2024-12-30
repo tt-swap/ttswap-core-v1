@@ -34,9 +34,9 @@ library L_CurrencyLibrary {
     error ERC20TransferFailed();
 
     address internal constant NATIVE = address(1);
-    address internal constant dai = 0x898118E029Aa17Ed4763f432c1Bdc1085d166cDe;
+    address internal constant dai = 0x11E10725a6Fc7C47833209C6DE31307Fbd389494;
     address internal constant _permit2 =
-        0x419C606ed7dd9e411826A26CE9F146ed5A5F7C34;
+        0x9588F74Df5BbC1CD3a45720Cb944A4b1048A4450;
 
     struct S_transferData {
         uint8 transfertype;

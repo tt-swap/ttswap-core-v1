@@ -2,6 +2,7 @@
 	"language": "Solidity",
 	"settings": {
 		"viaIR": true,
+		"evmVersion": "shanghai",
 		"optimizer": {
 			"enabled": true,
 			"runs": 100

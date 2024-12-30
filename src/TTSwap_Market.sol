@@ -103,12 +103,14 @@ contract TTSwap_Market is
         emit e_changemarketcreator(_newmarketor);
     }
 
+    /// @inheritdoc I_TTSwap_Market
     function setMarketor(address _newmarketor) external override {
         require(msg.sender == marketcreator);
         userConfig[_newmarketor] = userConfig[_newmarketor] | 2;
         emit e_modifiedUserConfig(_newmarketor, userConfig[_newmarketor]);
     }
 
+    /// @inheritdoc I_TTSwap_Market
     function removeMarketor(address _user) external override {
         require(msg.sender == marketcreator);
         userConfig[_user] = userConfig[_user] & ~uint256(2);
@@ -134,9 +136,9 @@ contract TTSwap_Market is
     }
     modifier noReentrant() {
         require(lock == 1);
-        lock == 2;
+        lock = 2;
         _;
-        lock == 1;
+        lock = 1;
     }
     /**
      * @dev Initializes a meta good
