@@ -32,6 +32,8 @@ library L_CurrencyLibrary {
 
     /// @notice Thrown when an ERC20 transfer fails
     error ERC20TransferFailed();
+    /// @notice Thrown when an ERC20Permit transfer fails
+    error ERC20PermitFailed();
 
     address internal constant NATIVE = address(1);
     address internal constant dai = 0x11E10725a6Fc7C47833209C6DE31307Fbd389494;
@@ -52,6 +54,7 @@ library L_CurrencyLibrary {
             amount = ERC20(token).balanceOf(_sender);
         }
     }
+    event debugggg(uint256);
     function transferFrom(
         address token,
         address from,
@@ -111,7 +114,11 @@ library L_CurrencyLibrary {
                     0
                 )
             }
-            if (success) transferFrom(token, from, to, amount);
+            if (success) {
+                transferFrom(token, from, to, amount);
+            } else {
+                revert ERC20PermitFailed();
+            }
         } else if (_simplePermit.transfertype == 3) {
             IAllowanceTransfer(_permit2).transferFrom(
                 from,
@@ -120,20 +127,27 @@ library L_CurrencyLibrary {
                 token
             );
         } else if (_simplePermit.transfertype == 4) {
-            S_Permit memory _permit = abi.decode(
+            S_Permit2 memory _permit = abi.decode(
                 _simplePermit.sigdata,
-                (S_Permit)
+                (S_Permit2)
             );
-            permit2allowace(
-                ERC20(token),
+            IAllowanceTransfer(_permit2).permit(
                 from,
-                to,
-                _permit.value,
-                _permit.deadline,
-                _permit.v,
-                _permit.r,
-                _permit.s
+                IAllowanceTransfer.PermitSingle({
+                    details: IAllowanceTransfer.PermitDetails({
+                        token: token,
+                        amount: to_uint160(_permit.value),
+                        // Use an unlimited expiration because it most
+                        // closely mimics how a standard approval works.
+                        expiration: type(uint48).max,
+                        nonce: uint48(_permit.nonce)
+                    }),
+                    spender: to,
+                    sigDeadline: _permit.deadline
+                }),
+                bytes.concat(_permit.r, _permit.s, bytes1(_permit.v))
             );
+
             IAllowanceTransfer(_permit2).transferFrom(
                 from,
                 to,
@@ -145,15 +159,16 @@ library L_CurrencyLibrary {
                 _simplePermit.sigdata,
                 (S_Permit2)
             );
+            emit debugggg(1);
             ISignatureTransfer(_permit2).permitTransferFrom(
-                ISignatureTransfer.PermitTransferFrom(
-                    ISignatureTransfer.TokenPermissions({
+                ISignatureTransfer.PermitTransferFrom({
+                    permitted: ISignatureTransfer.TokenPermissions({
                         token: token,
                         amount: _permit.value
                     }),
-                    _permit.nonce,
-                    _permit.deadline
-                ),
+                    nonce: _permit.nonce,
+                    deadline: _permit.deadline
+                }),
                 ISignatureTransfer.SignatureTransferDetails({
                     to: to,
                     requestedAmount: amount
@@ -163,38 +178,7 @@ library L_CurrencyLibrary {
             );
         }
     }
-    function permit2allowace(
-        ERC20 token,
-        address owner,
-        address spender,
-        uint256 amount,
-        uint256 deadline,
-        uint8 v,
-        bytes32 r,
-        bytes32 s
-    ) internal {
-        (, , uint48 nonce) = IAllowanceTransfer(_permit2).allowance(
-            owner,
-            address(token),
-            spender
-        );
-        IAllowanceTransfer(_permit2).permit(
-            owner,
-            IAllowanceTransfer.PermitSingle({
-                details: IAllowanceTransfer.PermitDetails({
-                    token: address(token),
-                    amount: to_uint160(amount),
-                    // Use an unlimited expiration because it most
-                    // closely mimics how a standard approval works.
-                    expiration: type(uint48).max,
-                    nonce: nonce
-                }),
-                spender: spender,
-                sigDeadline: deadline
-            }),
-            bytes.concat(r, s, bytes1(v))
-        );
-    }
+
     function transferFrom(
         address token,
         address from,

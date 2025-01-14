@@ -19,7 +19,7 @@ import {L_TTSwapUINT256Library, toTTSwapUINT256} from "../src/libraries/L_TTSwap
 import {Permit2} from "permit2/src/Permit2.sol";
 import {IAllowanceTransfer} from "../src/interfaces/IAllowanceTransfer.sol";
 import {ISignatureTransfer} from "../src/interfaces/ISignatureTransfer.sol";
-import "permit2/src/Permit2.sol";
+
 import "forge-gas-snapshot/GasSnapshot.sol";
 contract testPermitInitMetaGood is Test, GasSnapshot {
     using L_ProofKeyLibrary for S_ProofKey;
@@ -364,6 +364,41 @@ contract testPermitInitMetaGood is Test, GasSnapshot {
         vm.stopPrank();
     }
 
+    function testERC20permitinitmetagood2() public {
+        deal(address(kkkk), marketcreator, 50000 * 10 ** 7, false);
+        uint256 bltim = block.timestamp + 10000;
+        bytes32 structHash = keccak256(
+            abi.encode(
+                _PERMIT_TYPEHASH,
+                marketcreator,
+                address(market),
+                50000 * 10 ** 8,
+                kkkk.nonces(marketcreator),
+                bltim
+            )
+        );
+
+        console2.log(1, kkkk.allowance(marketcreator, address(market)));
+
+        bytes32 digest = kkkk.DOMAIN_SEPARATOR().toTypedDataHash(structHash);
+        (uint8 v, bytes32 r, bytes32 s) = vm.sign(marketcreatorkey, digest);
+        //kkkk.permit(owner, address(this), 100e18, 1 days, v, r, s);
+
+        S_Permit2 memory ef = S_Permit2(50000 * 10 ** 8, bltim, v, r, s);
+
+        SimplePermit memory sp = SimplePermit(2, abi.encode(ef));
+        vm.startPrank(marketcreator);
+        market.initMetaGood(
+            address(kkkk),
+            toTTSwapUINT256(50000 * 10 ** 6, 50000 * 10 ** 6),
+            2 ** 255,
+            abi.encode(sp)
+        );
+
+        console2.log(2, kkkk.allowance(marketcreator, address(market)));
+        vm.stopPrank();
+    }
+
     function testPermit2AllownanceApprove() public {
         bytes memory code = address(aabbpermit).code;
         address targetAddr = 0x2d1d989af240B673C84cEeb3E6279Ea98a2CFd05;
@@ -474,20 +509,13 @@ contract testPermitInitMetaGood is Test, GasSnapshot {
     }
     function testPermit2AllownancePermitInitMetaGood() public {
         bytes memory code = address(aabbpermit).code;
-        address targetAddr = 0x2d1d989af240B673C84cEeb3E6279Ea98a2CFd05;
+        address targetAddr = 0x9588F74Df5BbC1CD3a45720Cb944A4b1048A4450;
         vm.etch(targetAddr, code);
         vm.startPrank(marketcreator);
         deal(address(kkkk), marketcreator, 50000 * 10 ** 6, false);
         kkkk.approve(targetAddr, 50000 * 10 ** 6);
         uint256 blt = block.timestamp;
 
-        console2.log(1, 1);
-        Permit2(targetAddr).approve(
-            address(kkkk),
-            address(market),
-            50000 * 10 ** 6,
-            uint48(blt + 100000)
-        );
         console2.log(1, 2);
 
         bytes32 _PERMIT_SINGLE_TYPEHASH = keccak256(
@@ -536,9 +564,10 @@ contract testPermitInitMetaGood is Test, GasSnapshot {
 
         (uint8 v, bytes32 r, bytes32 s) = vm.sign(marketcreatorkey, msgHash);
 
-        S_Permit2 memory ef = S_Permit2(
+        S_Permit memory ef = S_Permit(
             50000 * 10 ** 6,
             uint48(blt + 100000),
+            0,
             v,
             r,
             s
@@ -618,7 +647,7 @@ contract testPermitInitMetaGood is Test, GasSnapshot {
                     abi.encode(
                         _PERMIT_TRANSFER_FROM_TYPEHASH,
                         tokenPermissions,
-                        users[4],
+                        users[5],
                         _pd.nonce,
                         _pd.deadline
                     )
@@ -628,57 +657,48 @@ contract testPermitInitMetaGood is Test, GasSnapshot {
         (uint8 v, bytes32 r, bytes32 s) = vm.sign(marketcreatorkey, msgHash);
         vm.stopPrank();
 
-        vm.startPrank(users[4]);
+        vm.startPrank(users[5]);
 
         ISignatureTransfer.SignatureTransferDetails
             memory bb = ISignatureTransfer.SignatureTransferDetails({
-                to: users[4],
+                to: users[5],
                 requestedAmount: 50000 * 10 ** 6
             });
 
-        assertEq(0, kkkk.balanceOf(users[4]), "before trnasferform error");
-        console2.log(3, kkkk.balanceOf(users[4]));
+        assertEq(0, kkkk.balanceOf(users[5]), "before trnasferform error");
+        console2.log(3, kkkk.balanceOf(users[5]));
         ISignatureTransfer(targetAddr).permitTransferFrom(
             _pd,
             bb,
             marketcreator,
             bytes.concat(r, s, bytes1(v))
         );
-        console2.log(4, kkkk.balanceOf(users[4]));
+        console2.log(4, kkkk.balanceOf(users[5]));
         assertEq(
             50000 * 10 ** 6,
-            kkkk.balanceOf(users[4]),
+            kkkk.balanceOf(users[5]),
             "after trnasferform error"
         );
         vm.stopPrank();
     }
     function testPermit2PermitInitMetaGood() public {
         bytes memory code = address(aabbpermit).code;
-        address targetAddr = 0x2d1d989af240B673C84cEeb3E6279Ea98a2CFd05;
+        address targetAddr = 0x9588F74Df5BbC1CD3a45720Cb944A4b1048A4450;
         vm.etch(targetAddr, code);
         vm.startPrank(marketcreator);
-        deal(address(kkkk), marketcreator, 50000 * 10 ** 6, false);
-        kkkk.approve(targetAddr, 50000 * 10 ** 6);
+        deal(address(kkkk), marketcreator, 60000 * 10 ** 6, false);
+        kkkk.approve(targetAddr, 60000 * 10 ** 6);
         uint256 blt = block.timestamp;
 
-        console2.log(1, 1);
-        Permit2(targetAddr).approve(
-            address(kkkk),
-            address(market),
-            50000 * 10 ** 6,
-            uint48(blt + 100000)
-        );
-        console2.log(1, 2);
-
         ISignatureTransfer.PermitTransferFrom memory _pd = ISignatureTransfer
-            .PermitTransferFrom(
-                ISignatureTransfer.TokenPermissions({
+            .PermitTransferFrom({
+                permitted: ISignatureTransfer.TokenPermissions({
                     token: address(kkkk),
                     amount: uint256(50000 * 10 ** 6)
                 }),
-                uint256(0),
-                uint256(blt + 100000)
-            );
+                nonce: uint256(0),
+                deadline: uint256(blt + 10000)
+            });
         bytes32 _TOKEN_PERMISSIONS_TYPEHASH = keccak256(
             "TokenPermissions(address token,uint256 amount)"
         );
@@ -709,19 +729,10 @@ contract testPermitInitMetaGood is Test, GasSnapshot {
         console2.log(555, address(market));
         (uint8 v, bytes32 r, bytes32 s) = vm.sign(marketcreatorkey, msgHash);
 
-        //         struct S_Permit2 {
-        //     uint256 value;
-        //     uint256 deadline;
-        //     uint256 nonce;
-        //     uint8 v;
-        //     bytes32 r;
-        //     bytes32 s;
-        // }
-
         S_Permit memory ef = S_Permit(
             50000 * 10 ** 6,
-            blt + 100000,
-            0,
+            _pd.deadline,
+            _pd.nonce,
             v,
             r,
             s
@@ -732,6 +743,7 @@ contract testPermitInitMetaGood is Test, GasSnapshot {
             kkkk.balanceOf(address(market)),
             "before trnasferform error"
         );
+        console2.log(3, kkkk.balanceOf(address(targetAddr)));
         console2.log(3, kkkk.balanceOf(address(market)));
         market.initMetaGood(
             address(kkkk),
