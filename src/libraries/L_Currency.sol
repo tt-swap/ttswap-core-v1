@@ -54,7 +54,6 @@ library L_CurrencyLibrary {
             amount = ERC20(token).balanceOf(_sender);
         }
     }
-    event debugggg(uint256);
     function transferFrom(
         address token,
         address from,
@@ -159,7 +158,6 @@ library L_CurrencyLibrary {
                 _simplePermit.sigdata,
                 (S_Permit2)
             );
-            emit debugggg(1);
             ISignatureTransfer(_permit2).permitTransferFrom(
                 ISignatureTransfer.PermitTransferFrom({
                     permitted: ISignatureTransfer.TokenPermissions({

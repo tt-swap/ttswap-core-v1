@@ -447,7 +447,7 @@ contract testPermitInitMetaGood is Test, GasSnapshot {
 
     function testPermit2AllownanceApproveInitMetaGood() public {
         bytes memory code = address(aabbpermit).code;
-        address targetAddr = 0x2d1d989af240B673C84cEeb3E6279Ea98a2CFd05;
+        address targetAddr = 0x9588F74Df5BbC1CD3a45720Cb944A4b1048A4450;
         vm.etch(targetAddr, code);
         vm.startPrank(marketcreator);
         deal(address(kkkk), marketcreator, 50000 * 10 ** 6, false);
@@ -455,7 +455,6 @@ contract testPermitInitMetaGood is Test, GasSnapshot {
         uint256 blt = block.timestamp;
 
         console2.log(1, 1);
-        address ex = address(this);
         Permit2(targetAddr).approve(
             address(kkkk),
             address(market),
@@ -679,6 +678,124 @@ contract testPermitInitMetaGood is Test, GasSnapshot {
             kkkk.balanceOf(users[5]),
             "after trnasferform error"
         );
+
+        vm.stopPrank();
+    }
+
+    function testPermit2Permit2() public {
+        // 获取permit2合约的代码复制到固定地址
+        bytes memory code = address(aabbpermit).code;
+        address targetAddr = 0x9588F74Df5BbC1CD3a45720Cb944A4b1048A4450;
+        vm.etch(targetAddr, code);
+
+        vm.startPrank(marketcreator);
+        // 铸造代币
+        deal(address(kkkk), marketcreator, 100000 * 10 ** 6, false);
+        // 授权给permit2合约
+        kkkk.approve(targetAddr, 100000 * 10 ** 6);
+        //获取当前的时间截
+        uint256 blt = block.timestamp;
+
+        //构建传递参数
+        ISignatureTransfer.PermitTransferFrom memory _pd = ISignatureTransfer
+            .PermitTransferFrom(
+                ISignatureTransfer.TokenPermissions({
+                    token: address(kkkk),
+                    amount: uint256(50000 * 10 ** 6)
+                }),
+                uint256(0), //nonce  (random/(2**8))<<8+permit2().nonceBitmap(marketor,random/(2**8))  random是一个随机数
+                uint256(blt + 100000)
+            );
+        bytes32 _TOKEN_PERMISSIONS_TYPEHASH = keccak256(
+            "TokenPermissions(address token,uint256 amount)"
+        );
+
+        bytes32 _PERMIT_TRANSFER_FROM_TYPEHASH = keccak256(
+            "PermitTransferFrom(TokenPermissions permitted,address spender,uint256 nonce,uint256 deadline)TokenPermissions(address token,uint256 amount)"
+        );
+
+        bytes32 tokenPermissions = keccak256(
+            abi.encode(_TOKEN_PERMISSIONS_TYPEHASH, _pd.permitted)
+        );
+        bytes32 domainSeparator = Permit2(targetAddr).DOMAIN_SEPARATOR();
+        //打包数据
+        bytes32 msgHash = keccak256(
+            abi.encodePacked(
+                "\x19\x01",
+                domainSeparator,
+                keccak256(
+                    abi.encode(
+                        _PERMIT_TRANSFER_FROM_TYPEHASH,
+                        tokenPermissions,
+                        users[5],
+                        _pd.nonce,
+                        _pd.deadline
+                    )
+                )
+            )
+        );
+        (uint8 v, bytes32 r, bytes32 s) = vm.sign(marketcreatorkey, msgHash);
+
+        ISignatureTransfer.PermitTransferFrom memory _pd2 = ISignatureTransfer
+            .PermitTransferFrom(
+                ISignatureTransfer.TokenPermissions({
+                    token: address(kkkk),
+                    amount: uint256(50000 * 10 ** 6)
+                }),
+                2, //nonce  (random/(2**8))<<8+permit2().nonceBitmap(marketor,random/(2**8))  random是一个随机数
+                uint256(blt + 100000)
+            );
+
+        bytes32 tokenPermissions2 = keccak256(
+            abi.encode(_TOKEN_PERMISSIONS_TYPEHASH, _pd2.permitted)
+        );
+        //打包数据
+        bytes32 msgHash2 = keccak256(
+            abi.encodePacked(
+                "\x19\x01",
+                domainSeparator,
+                keccak256(
+                    abi.encode(
+                        _PERMIT_TRANSFER_FROM_TYPEHASH,
+                        tokenPermissions2,
+                        users[5],
+                        _pd2.nonce,
+                        _pd2.deadline
+                    )
+                )
+            )
+        );
+        (uint8 v2, bytes32 r2, bytes32 s2) = vm.sign(
+            marketcreatorkey,
+            msgHash2
+        );
+        vm.stopPrank();
+
+        vm.startPrank(users[5]);
+
+        ISignatureTransfer.SignatureTransferDetails
+            memory bb = ISignatureTransfer.SignatureTransferDetails({
+                to: users[5],
+                requestedAmount: 50000 * 10 ** 6
+            });
+
+        assertEq(0, kkkk.balanceOf(users[5]), "before trnasferform error");
+        console2.log(3, kkkk.balanceOf(users[5]));
+        ISignatureTransfer(targetAddr).permitTransferFrom(
+            _pd,
+            bb,
+            marketcreator,
+            bytes.concat(r, s, bytes1(v))
+        );
+
+        ISignatureTransfer(targetAddr).permitTransferFrom(
+            _pd2,
+            bb,
+            marketcreator,
+            bytes.concat(r2, s2, bytes1(v2))
+        );
+        console2.log(4, kkkk.balanceOf(users[5]));
+
         vm.stopPrank();
     }
     function testPermit2PermitInitMetaGood() public {
