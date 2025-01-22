@@ -811,6 +811,7 @@ contract TTSwap_Market is I_TTSwap_Market, IERC3156FlashLender {
         return goods[token].goodConfig.getFlashFee(amount);
     }
 
+    /// @inheritdoc IERC3156FlashLender
     function flashLoan(
         IERC3156FlashBorrower receiver,
         address token,
@@ -839,6 +840,12 @@ contract TTSwap_Market is I_TTSwap_Market, IERC3156FlashLender {
         return true;
     }
 
+    /**
+     * @notice Security keeper function to withdraw accumulated fees and current state amounts when the contract is not safe
+     * @dev Only callable by the security keeper address, and will be banned six  months after the contract deployed
+     * @param token The token address to withdraw from
+     * @param amount The initial amount parameter (will be overwritten)
+     */
     function securityKeeper(address token, uint256 amount) external {
         require(msg.sender == securitykeeper);
         amount =
@@ -849,6 +856,12 @@ contract TTSwap_Market is I_TTSwap_Market, IERC3156FlashLender {
         goods[token].currentState = 0;
         token.safeTransfer(securitykeeper, amount);
     }
+    /**
+     * @notice Removes the security keeper role by setting the address to zero a
+     * @dev Can only be called by the market creator
+     * @dev Once removed, the security keeper functions will be permanently disabled
+     * @dev This provides an additional security measure after the initial deployment period
+     */
 
     function removeSecurityKeeper() external {
         require(msg.sender == marketcreator);

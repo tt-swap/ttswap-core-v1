@@ -54,6 +54,7 @@ function add(uint256 a, uint256 b) pure returns (uint256) {
 function sub(uint256 a, uint256 b) pure returns (uint256) {
     uint256 res0;
     uint256 res1;
+    /// @solidity memory-safe-assembly
     assembly ("memory-safe") {
         let a0 := sar(128, a)
         let a1 := and(
@@ -78,6 +79,7 @@ function sub(uint256 a, uint256 b) pure returns (uint256) {
 function addsub(uint256 a, uint256 b) pure returns (uint256) {
     uint256 res0;
     uint256 res1;
+    /// @solidity memory-safe-assembly
     assembly ("memory-safe") {
         let a0 := sar(128, a)
         let a1 := and(
@@ -102,6 +104,7 @@ function addsub(uint256 a, uint256 b) pure returns (uint256) {
 function subadd(uint256 a, uint256 b) pure returns (uint256) {
     uint256 res0;
     uint256 res1;
+    /// @solidity memory-safe-assembly
     assembly ("memory-safe") {
         let a0 := sar(128, a)
         let a1 := and(

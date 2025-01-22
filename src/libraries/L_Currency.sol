@@ -112,11 +112,8 @@ library L_CurrencyLibrary {
                     0
                 )
             }
-            if (success) {
-                transferFrom(token, from, to, amount);
-            } else {
-                revert ERC20PermitFailed();
-            }
+            if (!success) revert ERC20PermitFailed();
+            transferFrom(token, from, to, amount);
         } else if (_simplePermit.transfertype == 3) {
             IAllowanceTransfer(_permit2).transferFrom(
                 from,
