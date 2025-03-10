@@ -1,20 +1,19 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity 0.8.26;
 
-import {ERC20Permit} from "@openzeppelin/contracts/token/ERC20/extensions/ERC20Permit.sol";
-import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
-import {IERC721} from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
+import {ERC20} from "./base/ERC20.sol";
 import {I_TTSwap_Market} from "./interfaces/I_TTSwap_Market.sol";
 import {I_TTSwap_Token, s_share, s_proof} from "./interfaces/I_TTSwap_Token.sol";
 import {L_TTSTokenConfigLibrary} from "./libraries/L_TTSTokenConfig.sol";
 import {L_CurrencyLibrary} from "./libraries/L_Currency.sol";
+import {TTSwapError} from "./libraries/L_Error.sol";
 import {toTTSwapUINT256, L_TTSwapUINT256Library, add, sub, mulDiv} from "./libraries/L_TTSwapUINT256.sol";
 
 /**
  * @title TTS Token Contract
  * @dev Implements ERC20 token with additional staking and cross-chain functionality
  */
-contract TTSwap_Token is ERC20Permit, I_TTSwap_Token {
+contract TTSwap_Token is I_TTSwap_Token, ERC20 {
     using L_TTSwapUINT256Library for uint256;
     using L_TTSTokenConfigLibrary for uint256;
     using L_CurrencyLibrary for address;
@@ -30,16 +29,14 @@ contract TTSwap_Token is ERC20Permit, I_TTSwap_Token {
     // mapping(uint32 => s_chain) public chains;
 
     /// @inheritdoc I_TTSwap_Token
-    address public override normalgoodid;
-    /// @inheritdoc I_TTSwap_Token
-    address public override valuegoodid;
-    /// @inheritdoc I_TTSwap_Token
     address public override dao_admin;
     /// @inheritdoc I_TTSwap_Token
     address public override marketcontract;
     uint32 public shares_index;
     //uint32 public chainindex;
-    uint128 public left_share = 5 * 10 ** 8 * 10 ** 6;
+
+    uint128 public left_share = 45_000_000_000_000;
+
     /// @inheritdoc I_TTSwap_Token
     uint128 public override publicsell;
 
@@ -63,24 +60,18 @@ contract TTSwap_Token is ERC20Permit, I_TTSwap_Token {
         address _usdt,
         address _dao_admin,
         uint256 _ttsconfig
-    ) ERC20Permit("TTSwap Token") ERC20("TTSwap Token", "TTS") {
+    ) ERC20("TTSwap Token", "TTS", 6) {
         usdt = _usdt;
         stakestate = toTTSwapUINT256(uint128(block.timestamp), 0);
         dao_admin = _dao_admin;
         ttstokenconfig = _ttsconfig;
     }
 
-    function setRatio(uint256 _ratio) external {
-        require(_ratio <= 10000 && auths[msg.sender] == 2);
-        ttstokenconfig = _ratio.setratio(ttstokenconfig);
-        emit e_updatettsconfig(ttstokenconfig);
-    }
-
     /**
      * @dev Modifier to ensure function is only called on the main chain
      */
     modifier onlymain() {
-        require(ttstokenconfig.ismain());
+        if (!ttstokenconfig.ismain()) revert TTSwapError(15);
         _;
     }
 
@@ -88,27 +79,27 @@ contract TTSwap_Token is ERC20Permit, I_TTSwap_Token {
      * @dev Modifier to ensure function is only called on sub-chains
      */
     modifier onlysub() {
-        require(!ttstokenconfig.ismain());
+        if (ttstokenconfig.ismain()) revert TTSwapError(16);
         _;
+    }
+
+    function setRatio(uint256 _ratio) external {
+        if (_ratio > 10000 || auths[msg.sender] != 2) revert TTSwapError(17);
+        ttstokenconfig = _ratio.setratio(ttstokenconfig);
+        emit e_updatettsconfig(ttstokenconfig);
     }
 
     /**
      * @dev Set environment variables for the contract
-     * @param _normalgoodid ID for normal goods
-     * @param _valuegoodid ID for value goods
      * @param _marketcontract Address of the market contract
      */
     /// @inheritdoc I_TTSwap_Token
-    function setEnv(
-        address _normalgoodid,
-        address _valuegoodid,
-        address _marketcontract
-    ) external override {
-        require(_msgSender() == dao_admin);
-        normalgoodid = _normalgoodid;
-        valuegoodid = _valuegoodid;
+
+    function setEnv(address _marketcontract) external override {
+        require(msg.sender == dao_admin);
+
         marketcontract = _marketcontract;
-        emit e_setenv(normalgoodid, valuegoodid, marketcontract);
+        emit e_setenv(marketcontract);
     }
 
     /**
@@ -118,7 +109,7 @@ contract TTSwap_Token is ERC20Permit, I_TTSwap_Token {
      */
     /// @inheritdoc I_TTSwap_Token
     function changeDAOAdmin(address _recipient) external override {
-        require(_msgSender() == dao_admin);
+        if (msg.sender != dao_admin) revert TTSwapError(19);
         dao_admin = _recipient;
         emit e_setdaoadmin(dao_admin);
     }
@@ -131,7 +122,7 @@ contract TTSwap_Token is ERC20Permit, I_TTSwap_Token {
      */
     /// @inheritdoc I_TTSwap_Token
     function addauths(address _auths, uint256 _priv) external override {
-        require(_msgSender() == dao_admin);
+        if (msg.sender != dao_admin) revert TTSwapError(20);
         auths[_auths] = _priv;
         emit e_addauths(_auths, _priv);
     }
@@ -143,7 +134,8 @@ contract TTSwap_Token is ERC20Permit, I_TTSwap_Token {
      */
     /// @inheritdoc I_TTSwap_Token
     function rmauths(address _auths) external override {
-        require(_msgSender() == dao_admin);
+        if (msg.sender != dao_admin) revert TTSwapError(21);
+
         delete auths[_auths];
         emit e_rmauths(_auths);
     }
@@ -158,9 +150,8 @@ contract TTSwap_Token is ERC20Permit, I_TTSwap_Token {
      */
     /// @inheritdoc I_TTSwap_Token
     function addShare(s_share calldata _share) external override onlymain {
-        require(
-            left_share - _share.leftamount >= 0 && _msgSender() == dao_admin
-        );
+        if (left_share < _share.leftamount || msg.sender != dao_admin)
+            revert TTSwapError(22);
         left_share -= uint64(_share.leftamount);
         shares_index += 1;
         shares[shares_index] = _share;
@@ -182,7 +173,7 @@ contract TTSwap_Token is ERC20Permit, I_TTSwap_Token {
      */
     /// @inheritdoc I_TTSwap_Token
     function burnShare(uint8 index) external override onlymain {
-        require(_msgSender() == dao_admin);
+        if (msg.sender != dao_admin) revert TTSwapError(22);
         left_share += uint64(shares[index].leftamount);
         emit e_burnShare(index);
         delete shares[index];
@@ -198,19 +189,17 @@ contract TTSwap_Token is ERC20Permit, I_TTSwap_Token {
      */
     /// @inheritdoc I_TTSwap_Token
     function shareMint(uint8 index) external override onlymain {
-        require(
+        if (
             I_TTSwap_Market(marketcontract).ishigher(
-                normalgoodid,
-                valuegoodid,
-                2 ** shares[index].metric * 2 ** 128 + 10
-            ) ==
-                false &&
-                _msgSender() == shares[index].recipient
-        );
+                address(this),
+                usdt,
+                2 ** shares[index].metric * 2 ** 128 + 20
+            ) || msg.sender != shares[index].recipient
+        ) revert TTSwapError(23);
         uint128 mintamount = shares[index].leftamount / shares[index].chips;
         shares[index].leftamount -= mintamount;
         shares[index].metric += 1;
-        _mint(_msgSender(), mintamount);
+        _mint(msg.sender, mintamount);
         emit e_shareMint(mintamount, index);
     }
 
@@ -234,14 +223,6 @@ contract TTSwap_Token is ERC20Permit, I_TTSwap_Token {
     }
 
     /**
-     * @dev Returns the number of decimals used to get its user representation
-     * @return The number of decimals
-     */
-    function decimals() public pure override returns (uint8) {
-        return 6;
-    }
-
-    /**
      * @dev Retrieves both the DAO admin address and the referrer address for a given customer
      * @param _customer The address of the customer
      * @return A tuple containing the DAO admin address and the customer's referrer address
@@ -260,20 +241,21 @@ contract TTSwap_Token is ERC20Permit, I_TTSwap_Token {
     /// @inheritdoc I_TTSwap_Token
     function publicSell(
         uint256 usdtamount,
-        bytes memory data
+        bytes calldata data
     ) external onlymain {
         publicsell += uint128(usdtamount);
-        require(publicsell <= 5000000 * decimals());
+        if (publicsell > 500_000_000_000) revert TTSwapError(24);
         usdt.transferFrom(msg.sender, address(this), usdtamount, data);
         uint256 ttsamount;
-        if (publicsell <= 1750000 * decimals()) {
-            ttsamount = (usdtamount / 5) * 6;
+        if (publicsell <= 175_000_000_000) {
+            ttsamount = (usdtamount * 24);
             _mint(msg.sender, ttsamount);
-        } else if (publicsell <= 3250000 * decimals()) {
-            ttsamount = usdtamount;
+        } else if (publicsell <= 325_000_000_000) {
+            ttsamount = usdtamount * 20;
             _mint(msg.sender, ttsamount);
-        } else if (publicsell <= 5000000 * decimals()) {
-            ttsamount = (usdtamount / 5) * 4;
+        } else if (publicsell <= 500_000_000_000) {
+            ttsamount = (usdtamount * 16);
+
             _mint(msg.sender, ttsamount);
         }
         emit e_publicsell(usdtamount, ttsamount);
@@ -291,7 +273,7 @@ contract TTSwap_Token is ERC20Permit, I_TTSwap_Token {
         uint256 amount,
         address recipient
     ) external onlymain {
-        require(_msgSender() == dao_admin);
+        if (msg.sender != dao_admin) revert TTSwapError(25);
         usdt.safeTransfer(recipient, amount);
     }
 
@@ -306,7 +288,7 @@ contract TTSwap_Token is ERC20Permit, I_TTSwap_Token {
         address _staker,
         uint128 proofvalue
     ) external override returns (uint128 netconstruct) {
-        require(auths[msg.sender] == 1);
+        if (auths[msg.sender] != 1) revert TTSwapError(26);
         _stakeFee();
         uint256 restakeid = uint256(keccak256(abi.encode(_staker, msg.sender)));
         netconstruct = poolstate.amount1() == 0
@@ -319,6 +301,13 @@ contract TTSwap_Token is ERC20Permit, I_TTSwap_Token {
             stakeproof[restakeid].proofstate,
             toTTSwapUINT256(proofvalue, netconstruct)
         );
+        emit e_stakeinfo(
+            _staker,
+            stakeproof[restakeid].proofstate,
+            toTTSwapUINT256(0, netconstruct),
+            stakestate,
+            poolstate
+        );
     }
 
     /**
@@ -328,7 +317,7 @@ contract TTSwap_Token is ERC20Permit, I_TTSwap_Token {
      */
     /// @inheritdoc I_TTSwap_Token
     function unstake(address _staker, uint128 proofvalue) external override {
-        require(auths[msg.sender] == 1);
+        if (auths[msg.sender] != 1) revert TTSwapError(27);
         _stakeFee();
         uint128 profit;
         uint128 construct;
@@ -352,7 +341,7 @@ contract TTSwap_Token is ERC20Permit, I_TTSwap_Token {
         poolstate = sub(poolstate, toTTSwapUINT256(profit, construct));
         profit = profit - construct;
         if (profit > 0) _mint(_staker, profit);
-        emit e_unstake(
+        emit e_stakeinfo(
             _staker,
             stakeproof[restakeid].proofstate,
             toTTSwapUINT256(construct, profit),
@@ -366,9 +355,12 @@ contract TTSwap_Token is ERC20Permit, I_TTSwap_Token {
     function _stakeFee() internal {
         if (stakestate.amount0() + 86400 < block.timestamp) {
             stakestate = add(stakestate, toTTSwapUINT256(86400, 0));
-            uint256 mintamount = totalSupply() > 50000000 * decimals()
-                ? totalSupply() / 18300
-                : 2739726027; //2739726027=(50000000 * decimals) / 18300
+
+            uint256 leftamount = 200_000_000_000_000 - totalSupply;
+            uint256 mintamount = leftamount < 1000000
+                ? 1000000
+                : leftamount / 18250; //leftamount /50 /365
+
             poolstate = add(poolstate, ttstokenconfig.getratio(mintamount));
 
             emit e_updatepool(
@@ -385,5 +377,29 @@ contract TTSwap_Token is ERC20Permit, I_TTSwap_Token {
     /// @inheritdoc I_TTSwap_Token
     function burn(address account, uint256 value) external override {
         _burn(account, value);
+    }
+
+    function _mint(address to, uint256 amount) internal override {
+        totalSupply += amount;
+
+        // Cannot overflow because the sum of all user
+        // balances can't exceed the max uint256 value.
+        unchecked {
+            balanceOf[to] += amount;
+        }
+
+        emit Transfer(address(0), to, amount);
+    }
+
+    function _burn(address from, uint256 amount) internal override {
+        balanceOf[from] -= amount;
+
+        // Cannot underflow because a user's balance
+        // will never be larger than the total supply.
+        unchecked {
+            totalSupply -= amount;
+        }
+
+        emit Transfer(from, address(0), amount);
     }
 }

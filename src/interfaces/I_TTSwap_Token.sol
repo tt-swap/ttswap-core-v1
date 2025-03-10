@@ -10,14 +10,8 @@ interface I_TTSwap_Token {
     event e_addreferral(address users, address referral);
 
     /// @notice Emitted when environment variables are set
-    /// @param normalgoodid The ID of the normal good
-    /// @param valuegoodid The ID of the value good
     /// @param marketcontract The address of the market contract
-    event e_setenv(
-        address normalgoodid,
-        address valuegoodid,
-        address marketcontract
-    );
+    event e_setenv(address marketcontract);
 
     /// @notice Emitted when a DAO admin is set
     /// @param recipient The address of the new DAO admin
@@ -76,7 +70,7 @@ interface I_TTSwap_Token {
     /// @param unstakestate The state after unstaking
     /// @param stakestate The state of the stake
     /// @param poolstate The state of the pool
-    event e_unstake(
+    event e_stakeinfo(
         address recipient,
         uint256 proofvalue,
         uint256 unstakestate,
@@ -100,16 +94,7 @@ interface I_TTSwap_Token {
      * @return _marketcontract Returns the address of marketcontract
      */
     function marketcontract() external view returns (address _marketcontract);
-    /**
-     * @dev   Returns the ID of the normal good
-     * @return _normalgoodid Returns the id of normalgood
-     */
-    function normalgoodid() external view returns (address _normalgoodid);
-    /**
-     * @dev   Returns the ID of the value good
-     * @return _valuegoodid Returns the id of the valuegoodid
-     */
-    function valuegoodid() external view returns (address _valuegoodid);
+
     /**
      * @dev  Returns the amount of TTS available for public sale
      * @return _publicsell Returns the amount of TTS available for public sale
@@ -129,11 +114,7 @@ interface I_TTSwap_Token {
      * @return _auth Returns the authorization level
      */
     function auths(address recipent) external view returns (uint256 _auth);
-    function setEnv(
-        address _normalgoodid,
-        address _valuegoodid,
-        address _marketcontract
-    ) external; // Sets the environment variables for normal good ID, value good ID, and market contract address
+    function setEnv(address _marketcontract) external; // Sets the environment variables for normal good ID, value good ID, and market contract address
     /**
      * @dev Changes the DAO admin to the specified recipient address
      * @param _recipient user's address
@@ -162,7 +143,8 @@ interface I_TTSwap_Token {
      * @dev how much cost to buy tts
      * @param usdtamount usdt amount
      */
-    function publicSell(uint256 usdtamount, bytes memory data) external;
+    function publicSell(uint256 usdtamount, bytes calldata data) external;
+
     /**
      * @dev  Withdraws the specified amount from the public sale to the recipient
      * @param amount admin tranfer public sell to another address

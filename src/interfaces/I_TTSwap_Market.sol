@@ -2,7 +2,6 @@
 pragma solidity 0.8.26;
 
 import {toTTSwapUINT256, addsub, subadd} from "../libraries/L_TTSwapUINT256.sol";
-import {IERC3156FlashBorrower} from "@openzeppelin/contracts/interfaces/IERC3156FlashBorrower.sol";
 
 /// @title Market Management Interface
 /// @notice Defines the interface for managing market operations
@@ -104,24 +103,6 @@ interface I_TTSwap_Market {
         uint256 forgoodstate
     );
 
-    /// @notice Emitted when a user buys a good and pays the seller
-    /// @param buygood The ID of the good being bought
-    /// @param usegood The ID of the good being used for payment
-    /// @param fromer The address of the buyer
-    /// @param receipt The address of the recipient (seller)
-    /// @param swapvalue The trade value
-    /// @param buygoodstate The status of the bought good (amount0: fee, amount1: quantity)
-    /// @param usegoodstate The status of the used good (amount0: fee, amount1: quantity)
-    event e_buyGoodForPay(
-        address indexed buygood,
-        address indexed usegood,
-        address fromer,
-        address receipt,
-        uint128 swapvalue,
-        uint256 buygoodstate,
-        uint256 usegoodstate
-    );
-
     /// @notice Emitted when a user invests in a normal good
     /// @param _proofNo The ID of the investment proof
     /// @param _normalgoodid Packed data: first 128 bits for good's ID, last 128 bits for stake construct
@@ -175,7 +156,6 @@ interface I_TTSwap_Market {
 
     // Function declarations
 
-    function proofmapping(uint256) external view returns (uint256);
     function userConfig(address) external view returns (uint256);
     function setMarketor(address _newmarketor) external;
     function removeMarketor(address _user) external;
@@ -190,7 +170,7 @@ interface I_TTSwap_Market {
         address _erc20address,
         uint256 _initial,
         uint256 _goodconfig,
-        bytes memory data
+        bytes calldata data
     ) external payable returns (bool);
 
     /// @notice Initialize a normal good in the market
@@ -206,8 +186,8 @@ interface I_TTSwap_Market {
         uint256 _initial,
         address _erc20address,
         uint256 _goodConfig,
-        bytes memory data1,
-        bytes memory data2
+        bytes calldata data1,
+        bytes calldata data2
     ) external payable returns (bool);
 
     /// @notice Sell one good to buy another
@@ -226,31 +206,11 @@ interface I_TTSwap_Market {
         uint256 _limitprice,
         bool _istotal,
         address _referal,
-        bytes memory data1
+        bytes calldata data1
     )
         external
         payable
         returns (uint128 goodid2Quantity_, uint128 goodid2FeeQuantity_);
-
-    /// @notice Buy a good, sell another, and send to a recipient
-    /// @param _goodid1 ID of the good to buy
-    /// @param _goodid2 ID of the good to sell
-    /// @param _swapQuantity Quantity of _goodid2 to buy
-    /// @param _limitprice Price limit for the trade
-    /// @param _recipent Address of the recipient
-    /// @return goodid1Quantity_ Actual quantity of good1 received
-    /// @return goodid1FeeQuantity_ Fee quantity for good1
-    function buyGoodForPay(
-        address _goodid1,
-        address _goodid2,
-        uint128 _swapQuantity,
-        uint256 _limitprice,
-        address _recipent,
-        bytes memory data1
-    )
-        external
-        payable
-        returns (uint128 goodid1Quantity_, uint128 goodid1FeeQuantity_);
 
     /// @notice Invest in a normal good
     /// @param _togood ID of the normal good to invest in
@@ -261,8 +221,8 @@ interface I_TTSwap_Market {
         address _togood,
         address _valuegood,
         uint128 _quantity,
-        bytes memory data1,
-        bytes memory data2
+        bytes calldata data1,
+        bytes calldata data2
     ) external payable returns (bool);
 
     /// @notice Disinvest from a normal good
@@ -274,7 +234,7 @@ interface I_TTSwap_Market {
         uint256 _proofid,
         uint128 _goodQuantity,
         address _gater
-    ) external returns (bool);
+    ) external payable returns (bool);
 
     /// @notice Collect profit from an investment proof
     /// @param _proofid ID of the investment proof
@@ -283,7 +243,7 @@ interface I_TTSwap_Market {
     function collectProof(
         uint256 _proofid,
         address _gater
-    ) external returns (uint256 profit_);
+    ) external payable returns (uint256 profit_);
 
     /// @notice Check if the price of a good is higher than a comparison price
     /// @param goodid ID of the good to check
@@ -332,19 +292,6 @@ interface I_TTSwap_Market {
         uint256 _goodConfig
     ) external returns (bool);
 
-    /// @notice Transfers a good to another address
-    /// @param _goodid The ID of the good
-    /// @param _payquanity The quantity to transfer
-    /// @param _recipent The recipient's address
-    /// @param transdata The recipient's address
-    /// @return Success status
-    function payGood(
-        address _goodid,
-        uint128 _payquanity,
-        address _recipent,
-        bytes memory transdata
-    ) external payable returns (bool);
-
     /// @notice Changes the owner of a good
     /// @param _goodid The ID of the good
     /// @param _to The new owner's address
@@ -352,7 +299,7 @@ interface I_TTSwap_Market {
 
     /// @notice Collects commission for specified goods
     /// @param _goodid Array of good IDs
-    function collectCommission(address[] memory _goodid) external;
+    function collectCommission(address[] memory _goodid) external payable;
 
     /// @notice Queries commission for specified goods and recipient
     /// @param _goodid Array of good IDs
@@ -379,24 +326,8 @@ interface I_TTSwap_Market {
     function goodWelfare(
         address goodid,
         uint128 welfare,
-        bytes memory data1
+        bytes calldata data1
     ) external payable;
-
-    /**
-     * @dev Internal function to handle proof data deletion and updates during transfer.
-     * @param proofid The ID of the proof being transferred.
-     * @param from The address transferring the proof.
-     * @param to The address receiving the proof.
-     */
-    function delproofdata(uint256 proofid, address from, address to) external;
-
-    function flashLoan1(
-        IERC3156FlashBorrower receiver,
-        address token,
-        uint256 amount,
-        bytes calldata data,
-        bytes memory transdata
-    ) external returns (bool);
 }
 /**
  * @dev Represents the state of a proof

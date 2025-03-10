@@ -2,6 +2,7 @@
 pragma solidity 0.8.26;
 
 import {L_Proof} from "./L_Proof.sol";
+import {TTSwapError} from "./L_Error.sol";
 import {L_MarketConfigLibrary} from "./L_MarketConfig.sol";
 import {L_GoodConfigLibrary} from "./L_GoodConfig.sol";
 
@@ -192,116 +193,6 @@ library L_Good {
     }
 
     /**
-     * @notice Compute the swap result from good2 to good1
-     * @dev Implements a complex swap algorithm considering price limits, fees, and minimum swap amounts
-     * @param _stepCache A cache structure containing swap state and configurations
-     * @param _limitPrice The price limit for the swap
-     */
-    function swapCompute2(
-        swapCache memory _stepCache,
-        uint256 _limitPrice
-    ) internal pure {
-        // Check if the current price is higher than the limit price, if so, return immediately
-        if (
-            !lowerprice(
-                _stepCache.good1currentState,
-                _stepCache.good2currentState,
-                _limitPrice
-            )
-        ) {
-            uint128 minValue;
-            uint128 minQuantity;
-
-            // Calculate and deduct the buy fee
-            _stepCache.feeQuantity = _stepCache.good2config.getBuyFee(
-                _stepCache.remainQuantity
-            );
-
-            // Continue swapping while there's remaining quantity and price is favorable
-            while (
-                _stepCache.remainQuantity > 0 &&
-                lowerprice(
-                    _stepCache.good1currentState,
-                    _stepCache.good2currentState,
-                    _limitPrice
-                )
-            ) {
-                // Determine the minimum swap value (take the smaller of the two goods)
-                minValue = _stepCache.good1config.getSwapChips(
-                    _stepCache.good1currentState.amount0()
-                ) >=
-                    _stepCache.good2config.getSwapChips(
-                        _stepCache.good2currentState.amount0()
-                    )
-                    ? _stepCache.good2config.getSwapChips(
-                        _stepCache.good2currentState.amount0()
-                    )
-                    : _stepCache.good1config.getSwapChips(
-                        _stepCache.good1currentState.amount0()
-                    );
-
-                // Calculate the corresponding quantity for the minimum value
-                minQuantity = _stepCache
-                    .good2currentState
-                    .getamount1fromamount0(minValue);
-
-                if (_stepCache.remainQuantity > minQuantity) {
-                    // Swap the entire minQuantity
-                    _stepCache.remainQuantity -= minQuantity;
-
-                    // Calculate and add the output quantity
-                    _stepCache.outputQuantity += _stepCache
-                        .good1currentState
-                        .getamount1fromamount0(minValue);
-
-                    // Update the states of both goods
-                    _stepCache.good2currentState = addsub(
-                        _stepCache.good2currentState,
-                        toTTSwapUINT256(minValue, minQuantity)
-                    );
-                    _stepCache.good1currentState = subadd(
-                        _stepCache.good1currentState,
-                        toTTSwapUINT256(
-                            minValue,
-                            _stepCache.good1currentState.getamount1fromamount0(
-                                minValue
-                            )
-                        )
-                    );
-                } else {
-                    // Swap the remaining quantity
-                    minValue = _stepCache
-                        .good2currentState
-                        .getamount0fromamount1(_stepCache.remainQuantity);
-                    _stepCache.outputQuantity += _stepCache
-                        .good1currentState
-                        .getamount1fromamount0(minValue);
-
-                    // Update the states of both goods
-                    _stepCache.good2currentState = addsub(
-                        _stepCache.good2currentState,
-                        toTTSwapUINT256(minValue, _stepCache.remainQuantity)
-                    );
-
-                    _stepCache.good1currentState = subadd(
-                        _stepCache.good1currentState,
-                        toTTSwapUINT256(
-                            minValue,
-                            _stepCache.good1currentState.getamount1fromamount0(
-                                minValue
-                            )
-                        )
-                    );
-                    _stepCache.remainQuantity = 0;
-                }
-
-                // Update the total swap value
-                _stepCache.swapvalue += minValue;
-            }
-        }
-    }
-
-    /**
      * @notice Commit the result of a swap operation to the good's state
      * @dev Updates the current state and fee state of the good after a swap
      * @param _self Storage pointer to the good state
@@ -439,7 +330,13 @@ library L_Good {
             _investProof.state.amount0(),
             _investProof.invest.amount1()
         ).getamount0fromamount1(_params._goodQuantity);
-
+        // Ensure disinvestment conditions are met
+        if (
+            disinvestvalue >
+            _self.goodConfig.getDisinvestChips(_self.currentState.amount0()) ||
+            _params._goodQuantity >
+            _self.goodConfig.getDisinvestChips(_self.currentState.amount1())
+        ) revert TTSwapError(14);
         // Calculate initial disinvestment results for the main good
         normalGoodResult1_ = S_GoodDisinvestReturn(
             toTTSwapUINT256(
@@ -451,21 +348,6 @@ library L_Good {
                 _investProof.invest.amount1()
             ).getamount0fromamount1(_params._goodQuantity),
             _params._goodQuantity
-        );
-
-        // Ensure disinvestment conditions are met
-        require(
-            (_self.goodConfig.isvaluegood() ||
-                _valueGoodState.goodConfig.isvaluegood()) &&
-                disinvestvalue <
-                _self.goodConfig.getDisinvestChips(
-                    _self.currentState.amount0()
-                ) &&
-                _params._goodQuantity <
-                _self.goodConfig.getDisinvestChips(
-                    _self.currentState.amount1()
-                ),
-            "G011"
         );
 
         // Update main good states
@@ -544,17 +426,16 @@ library L_Good {
             );
 
             // Ensure value good disinvestment conditions are met
-            require(
-                disinvestvalue <
-                    _valueGoodState.goodConfig.getDisinvestChips(
-                        _valueGoodState.currentState.amount0()
-                    ) &&
-                    valueGoodResult2_.actualDisinvestQuantity <
-                    _valueGoodState.goodConfig.getDisinvestChips(
-                        _valueGoodState.currentState.amount1()
-                    ),
-                "G012"
-            );
+            if (
+                disinvestvalue >
+                _valueGoodState.goodConfig.getDisinvestChips(
+                    _valueGoodState.currentState.amount0()
+                ) ||
+                valueGoodResult2_.actualDisinvestQuantity >
+                _valueGoodState.goodConfig.getDisinvestChips(
+                    _valueGoodState.currentState.amount1()
+                )
+            ) revert TTSwapError(15);
 
             // Update value good states
             _valueGoodState.currentState = sub(
@@ -778,20 +659,8 @@ library L_Good {
      * @param _fee New configuration value to be applied
      */
     function fillFee(S_GoodState storage _self, uint256 _fee) internal {
-        _self.feeQuantityState =
-            (_self.feeQuantityState + (_fee % 2 ** 128)) <<
-            (2 ** 128);
-    }
-}
-
-library L_GoodIdLibrary {
-    /**
-     * @notice Convert a good key to an ID
-     * @dev This function converts a good key to a unique ID using keccak256 hashing
-     * @param goodKey The good key to be converted
-     * @return The unique ID of the good
-     */
-    function toId(S_GoodKey memory goodKey) internal pure returns (uint256) {
-        return uint256(keccak256(abi.encode(goodKey)));
+        unchecked {
+            _self.feeQuantityState = _self.feeQuantityState + (_fee << 128);
+        }
     }
 }

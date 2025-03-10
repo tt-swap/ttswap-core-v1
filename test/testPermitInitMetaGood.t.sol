@@ -2,18 +2,16 @@
 pragma solidity ^0.8.0;
 
 import {Test, console2} from "forge-std/Test.sol";
-import {MyToken} from "../src/ERC20.sol";
+import {MyToken} from "../src/test/MyToken.sol";
 import "../src/TTSwap_Market.sol";
 import {BaseSetup} from "./BaseSetup.t.sol";
 import {S_GoodKey, S_ProofKey} from "../src/interfaces/I_TTSwap_Market.sol";
 import {ECDSA} from "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 import {TTSwap_Token} from "../src/TTSwap_Token.sol";
 import {TTSwap_Market} from "../src/TTSwap_Market.sol";
-import {TTSwap_NFT} from "../src/TTSwap_NFT.sol";
-import {TTSwap_LimitOrder} from "../src/TTSwap_LimitOrder.sol";
 
-import {L_ProofKeyLibrary, L_Proof} from "../src/libraries/L_Proof.sol";
-import {L_GoodIdLibrary, L_Good} from "../src/libraries/L_Good.sol";
+import {L_ProofIdLibrary, L_Proof} from "../src/libraries/L_Proof.sol";
+import {L_Good} from "../src/libraries/L_Good.sol";
 import {L_TTSwapUINT256Library, toTTSwapUINT256} from "../src/libraries/L_TTSwapUINT256.sol";
 
 import {Permit2} from "permit2/src/Permit2.sol";
@@ -22,8 +20,8 @@ import {ISignatureTransfer} from "../src/interfaces/ISignatureTransfer.sol";
 
 import "forge-gas-snapshot/GasSnapshot.sol";
 contract testPermitInitMetaGood is Test, GasSnapshot {
-    using L_ProofKeyLibrary for S_ProofKey;
-    using L_GoodIdLibrary for S_GoodKey;
+    using L_ProofIdLibrary for S_ProofKey;
+
     using L_TTSwapUINT256Library for uint256;
     using ECDSA for bytes32;
     address metagood;
@@ -49,8 +47,6 @@ contract testPermitInitMetaGood is Test, GasSnapshot {
     address marketcreator;
     TTSwap_Market market;
     TTSwap_Token tts_token;
-    TTSwap_NFT tts_nft;
-    TTSwap_LimitOrder tts_limitorder;
     bytes internal constant defaultdata =
         abi.encode(L_CurrencyLibrary.S_transferData(1, ""));
     event debuggdata(bytes);
@@ -80,14 +76,10 @@ contract testPermitInitMetaGood is Test, GasSnapshot {
         eth = new MyToken("ETH", "ETH", 18);
         vm.startPrank(marketcreator);
         tts_token = new TTSwap_Token(address(usdt), marketcreator, 2 ** 255);
-        tts_nft = new TTSwap_NFT(address(tts_token));
-        tts_limitorder = new TTSwap_LimitOrder(marketcreator);
         snapStart("depoly Market Manager");
         market = new TTSwap_Market(
             m_marketconfig,
             address(tts_token),
-            address(tts_nft),
-            address(tts_limitorder),
             marketcreator,
             marketcreator
         );
@@ -170,9 +162,8 @@ contract testPermitInitMetaGood is Test, GasSnapshot {
             "after initial metagood:metagood marketcreator error"
         );
 
-        uint256 metaproof = market.proofmapping(
-            S_ProofKey(marketcreator, metagood, address(0)).toKey()
-        );
+        uint256 metaproof = S_ProofKey(marketcreator, metagood, address(0))
+            .toId();
         S_ProofState memory _proof1 = market.getProofState(metaproof);
         assertEq(
             _proof1.state.amount0(),
@@ -189,17 +180,7 @@ contract testPermitInitMetaGood is Test, GasSnapshot {
             0,
             "after initial:proof quantity error"
         );
-        assertEq(
-            tts_nft.balanceOf(marketcreator),
-            1,
-            "erc721 market balance error"
-        );
 
-        assertEq(
-            tts_nft.ownerOf(metaproof),
-            marketcreator,
-            "erc721 proof owner error"
-        );
         vm.stopPrank();
     }
 
@@ -267,9 +248,8 @@ contract testPermitInitMetaGood is Test, GasSnapshot {
             "after initial metagood:metagood marketcreator error"
         );
 
-        uint256 metaproof = market.proofmapping(
-            S_ProofKey(marketcreator, metagood, address(0)).toKey()
-        );
+        uint256 metaproof = S_ProofKey(marketcreator, metagood, address(0))
+            .toId();
         S_ProofState memory _proof1 = market.getProofState(metaproof);
         assertEq(
             _proof1.state.amount0(),
@@ -285,18 +265,6 @@ contract testPermitInitMetaGood is Test, GasSnapshot {
             _proof1.valueinvest.amount1(),
             0,
             "after initial:proof quantity error"
-        );
-
-        assertEq(
-            tts_nft.balanceOf(marketcreator),
-            1,
-            "erc721 market balance error"
-        );
-
-        assertEq(
-            tts_nft.ownerOf(metaproof),
-            marketcreator,
-            "erc721 proof owner error"
         );
 
         vm.stopPrank();
@@ -398,10 +366,9 @@ contract testPermitInitMetaGood is Test, GasSnapshot {
         console2.log(2, kkkk.allowance(marketcreator, address(market)));
         vm.stopPrank();
     }
-
     function testPermit2AllownanceApprove() public {
         bytes memory code = address(aabbpermit).code;
-        address targetAddr = 0x2d1d989af240B673C84cEeb3E6279Ea98a2CFd05;
+        address targetAddr = 0x419C606ed7dd9e411826A26CE9F146ed5A5F7C34;
         vm.etch(targetAddr, code);
         vm.startPrank(users[3]);
         deal(address(kkkk), users[3], 100000000000, false);
@@ -409,7 +376,6 @@ contract testPermitInitMetaGood is Test, GasSnapshot {
         uint256 blt = block.timestamp;
 
         console2.log(1, 1);
-        address ex = address(this);
         Permit2(targetAddr).approve(
             address(kkkk),
             users[4],
@@ -447,7 +413,9 @@ contract testPermitInitMetaGood is Test, GasSnapshot {
 
     function testPermit2AllownanceApproveInitMetaGood() public {
         bytes memory code = address(aabbpermit).code;
+
         address targetAddr = 0x9588F74Df5BbC1CD3a45720Cb944A4b1048A4450;
+
         vm.etch(targetAddr, code);
         vm.startPrank(marketcreator);
         deal(address(kkkk), marketcreator, 50000 * 10 ** 6, false);
@@ -508,7 +476,9 @@ contract testPermitInitMetaGood is Test, GasSnapshot {
     }
     function testPermit2AllownancePermitInitMetaGood() public {
         bytes memory code = address(aabbpermit).code;
+
         address targetAddr = 0x9588F74Df5BbC1CD3a45720Cb944A4b1048A4450;
+
         vm.etch(targetAddr, code);
         vm.startPrank(marketcreator);
         deal(address(kkkk), marketcreator, 50000 * 10 ** 6, false);
@@ -604,7 +574,7 @@ contract testPermitInitMetaGood is Test, GasSnapshot {
     function testPermit2Permit() public {
         // 获取permit2合约的代码复制到固定地址
         bytes memory code = address(aabbpermit).code;
-        address targetAddr = 0x2d1d989af240B673C84cEeb3E6279Ea98a2CFd05;
+        address targetAddr = 0x419C606ed7dd9e411826A26CE9F146ed5A5F7C34;
         vm.etch(targetAddr, code);
 
         vm.startPrank(marketcreator);
@@ -685,7 +655,9 @@ contract testPermitInitMetaGood is Test, GasSnapshot {
     function testPermit2Permit2() public {
         // 获取permit2合约的代码复制到固定地址
         bytes memory code = address(aabbpermit).code;
+
         address targetAddr = 0x9588F74Df5BbC1CD3a45720Cb944A4b1048A4450;
+
         vm.etch(targetAddr, code);
 
         vm.startPrank(marketcreator);
@@ -800,11 +772,13 @@ contract testPermitInitMetaGood is Test, GasSnapshot {
     }
     function testPermit2PermitInitMetaGood() public {
         bytes memory code = address(aabbpermit).code;
+
         address targetAddr = 0x9588F74Df5BbC1CD3a45720Cb944A4b1048A4450;
         vm.etch(targetAddr, code);
         vm.startPrank(marketcreator);
         deal(address(kkkk), marketcreator, 60000 * 10 ** 6, false);
         kkkk.approve(targetAddr, 60000 * 10 ** 6);
+
         uint256 blt = block.timestamp;
 
         ISignatureTransfer.PermitTransferFrom memory _pd = ISignatureTransfer
@@ -860,8 +834,10 @@ contract testPermitInitMetaGood is Test, GasSnapshot {
             kkkk.balanceOf(address(market)),
             "before trnasferform error"
         );
+
         console2.log(3, kkkk.balanceOf(address(targetAddr)));
         console2.log(3, kkkk.balanceOf(address(market)));
+
         market.initMetaGood(
             address(kkkk),
             toTTSwapUINT256(50000 * 10 ** 6, 50000 * 10 ** 6),

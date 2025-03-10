@@ -2,8 +2,10 @@
 pragma solidity 0.8.26;
 import {IAllowanceTransfer} from "../interfaces/IAllowanceTransfer.sol";
 import {ISignatureTransfer} from "../interfaces/ISignatureTransfer.sol";
-import {ERC20} from "solmate/src/tokens/ERC20.sol";
+import {IERC20Permit} from "../interfaces/IERC20Permit.sol";
+import {IERC20} from "../interfaces/IERC20.sol";
 import {IDAIPermit} from "../interfaces/IDAIPermit.sol";
+import {L_Transient} from "./L_Transient.sol";
 
 /// @title L_CurrencyLibrary
 /// @dev This library allows for transferring and holding native tokens and ERC20 tokens
@@ -26,15 +28,11 @@ library L_CurrencyLibrary {
         bytes32 r;
         bytes32 s;
     }
-    /// @notice Thrown when a native transfer fails
-
-    error NativeTransferFailed();
 
     /// @notice Thrown when an ERC20 transfer fails
     error ERC20TransferFailed();
     /// @notice Thrown when an ERC20Permit transfer fails
     error ERC20PermitFailed();
-
     address internal constant NATIVE = address(1);
     address internal constant dai = 0x11E10725a6Fc7C47833209C6DE31307Fbd389494;
     address internal constant _permit2 =
@@ -51,7 +49,7 @@ library L_CurrencyLibrary {
         if (token.isNative()) {
             amount = address(_sender).balance;
         } else {
-            amount = ERC20(token).balanceOf(_sender);
+            amount = IERC20(token).balanceOf(_sender);
         }
     }
     function transferFrom(
@@ -59,7 +57,7 @@ library L_CurrencyLibrary {
         address from,
         address to,
         uint256 amount,
-        bytes memory detail
+        bytes calldata detail
     ) internal {
         bool success;
         S_transferData memory _simplePermit = abi.decode(
@@ -67,7 +65,7 @@ library L_CurrencyLibrary {
             (S_transferData)
         );
         if (token.isNative()) {
-            if (msg.value != amount) revert NativeTransferFailed();
+            L_Transient.decreaseValue(amount);
         } else if (_simplePermit.transfertype == 1) {
             transferFrom(token, from, to, amount);
         } else if (_simplePermit.transfertype == 2) {
@@ -81,7 +79,7 @@ library L_CurrencyLibrary {
                     (
                         from,
                         address(this),
-                        ERC20(token).nonces(from),
+                        IDAIPermit(token).nonces(from),
                         _permit.deadline,
                         true,
                         _permit.v,
@@ -90,7 +88,7 @@ library L_CurrencyLibrary {
                     )
                 )
                 : abi.encodeCall(
-                    ERC20.permit,
+                    IERC20Permit.permit,
                     (
                         from,
                         to,
@@ -226,7 +224,7 @@ library L_CurrencyLibrary {
         address token,
         address from,
         uint256 amount,
-        bytes memory trandata
+        bytes calldata trandata
     ) internal {
         address to = address(this);
         transferFrom(token, from, to, uint128(amount), trandata);
@@ -242,12 +240,7 @@ library L_CurrencyLibrary {
 
         bool success;
         if (currency.isNative()) {
-            assembly {
-                // Transfer the ETH and store if it succeeded or not.
-                success := call(gas(), to, amount, 0, 0, 0, 0)
-            }
-
-            if (!success) revert NativeTransferFailed();
+            L_Transient.increaseValue(amount);
         } else {
             assembly {
                 // We'll write our calldata to this slot below, but restore it later.

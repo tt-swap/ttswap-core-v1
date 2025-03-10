@@ -4,11 +4,9 @@ pragma solidity 0.8.26;
 import "forge-gas-snapshot/GasSnapshot.sol";
 import {Test} from "forge-std/Test.sol";
 import {console2} from "forge-std/console2.sol";
-import {MyToken} from "../src/ERC20.sol";
+import {MyToken} from "../src/test/MyToken.sol";
 import {TTSwap_Token} from "../src/TTSwap_Token.sol";
 import {TTSwap_Market} from "../src/TTSwap_Market.sol";
-import {TTSwap_NFT} from "../src/TTSwap_NFT.sol";
-import {TTSwap_LimitOrder} from "../src/TTSwap_LimitOrder.sol";
 
 contract stakeandunstake is Test, GasSnapshot {
     address payable[8] internal users;
@@ -18,8 +16,6 @@ contract stakeandunstake is Test, GasSnapshot {
     address marketcreator;
     TTSwap_Market market;
     TTSwap_Token tts_token;
-    TTSwap_NFT tts_nft;
-    TTSwap_LimitOrder tts_trigger;
 
     function setUp() public virtual {
         vm.warp(1728111156);
@@ -48,14 +44,10 @@ contract stakeandunstake is Test, GasSnapshot {
             marketcreator,
             2 ** 255 + 10000
         );
-        tts_nft = new TTSwap_NFT(address(tts_token));
-        tts_trigger = new TTSwap_LimitOrder(address(tts_token));
         snapStart("depoly Market Manager");
         market = new TTSwap_Market(
             m_marketconfig,
             address(tts_token),
-            address(tts_nft),
-            address(tts_trigger),
             marketcreator,
             marketcreator
         );
@@ -77,7 +69,7 @@ contract stakeandunstake is Test, GasSnapshot {
         assertEq(tts_token.stakestate() % 2 ** 128, 100000, "pool value error");
         assertEq(
             tts_token.poolstate() / 2 ** 128,
-            2739726027,
+            10958904109,
             "pool asset error"
         );
         assertEq(tts_token.poolstate() % 2 ** 128, 0, "pool construct error");
@@ -97,10 +89,10 @@ contract stakeandunstake is Test, GasSnapshot {
         assertEq(tts_token.stakestate() % 2 ** 128, 99000, "pool value error");
         assertEq(
             tts_token.poolstate() / 2 ** 128,
-            2712328767,
+            10849315068,
             "pool asset error"
         );
         assertEq(tts_token.poolstate() % 2 ** 128, 0, "pool construct error");
-        assertEq(tts_token.balanceOf(users[2]), 27397260, "tts balance error");
+        assertEq(tts_token.balanceOf(users[2]), 109589041, "tts balance error");
     }
 }

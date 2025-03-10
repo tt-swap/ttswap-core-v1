@@ -10,8 +10,7 @@ function toTTSwapUINT256(
     uint128 _amount0,
     uint128 _amount1
 ) pure returns (uint256 balanceDelta) {
-    /// @solidity memory-safe-assembly
-    assembly {
+    assembly ("memory-safe") {
         balanceDelta := or(
             shl(128, _amount0),
             and(
@@ -167,7 +166,6 @@ library L_TTSwapUINT256Library {
     function amount0(
         uint256 balanceDelta
     ) internal pure returns (uint128 _amount0) {
-        /// @solidity memory-safe-assembly
         assembly {
             _amount0 := shr(128, balanceDelta)
         }
@@ -179,7 +177,6 @@ library L_TTSwapUINT256Library {
     function amount1(
         uint256 balanceDelta
     ) internal pure returns (uint128 _amount1) {
-        /// @solidity memory-safe-assembly
         assembly {
             _amount1 := balanceDelta
         }
