@@ -1,0 +1,873 @@
+{
+	"id": "0647fd4b203e9cc5751983ac552460c0",
+	"_format": "hh-sol-build-info-1",
+	"solcVersion": "0.8.26",
+	"solcLongVersion": "0.8.26+commit.8a97fa7a",
+	"input": {
+		"language": "Solidity",
+		"sources": {
+			"src/interfaces/I_TTSwap_NFT.sol": {
+				"content": "// SPDX-License-Identifier: MIT\npragma solidity 0.8.26;\n\n/// @title Investment Proof Interface\n/// @notice Contains a series of interfaces for goods\ninterface I_TTSwap_NFT {\n    /**\n     * @dev mint nft for recipent\n     * @param recipent who is  the tokenid  minted the tokenid for .\n     * @param tokenid the tokenid.\n     */\n    function mint(address recipent, uint256 tokenid) external;\n    /**\n     * @dev record which contract is storing the tokenid\n     * @param tokenid The current owner of the token.\n     * @return cd the contract address of tokenid\n     */\n    function proofsource(uint256 tokenid) external view returns (address cd);\n    /**\n     * @dev get the token  approved to the spender\n     * @param spender who\n     * @param tokenId The new owner.\n     * @return result\n     */\n    function isApprovedOrOwner(\n        address spender,\n        uint256 tokenId\n    ) external returns (bool result);\n\n    /**\n     * @dev burn tokenid\n     * @param tokenId which tokenid will be burned.\n     */\n    function burn(uint256 tokenId) external;\n    /**\n     * @dev Safely transfers the ownership of a given token ID to another address with a permit.\n     * @param from The current owner of the token.\n     * @param to The new owner.\n     * @param tokenId The ID of the token to be transferred.\n     * @param _data Additional data with no specified format.\n     * @param deadline The time at which the signature expires.\n     * @param signature A valid EIP712 signature.\n     */\n    function safeTransferFromWithPermit(\n        address from,\n        address to,\n        uint256 tokenId,\n        bytes memory _data,\n        uint256 deadline,\n        bytes memory signature\n    ) external;\n}\n"
+			}
+		},
+		"settings": {
+			"optimizer": {
+				"enabled": true,
+				"runs": 200
+			},
+			"outputSelection": {
+				"*": {
+					"": [
+						"ast"
+					],
+					"*": [
+						"abi",
+						"metadata",
+						"devdoc",
+						"userdoc",
+						"storageLayout",
+						"evm.legacyAssembly",
+						"evm.bytecode",
+						"evm.deployedBytecode",
+						"evm.methodIdentifiers",
+						"evm.gasEstimates",
+						"evm.assembly"
+					]
+				}
+			},
+			"remappings": [
+				"@erc721permit/=lib/erc721-permit/contracts/",
+				"ds-test/=lib/openzeppelin-contracts/lib/forge-std/lib/ds-test/src/",
+				"erc4626-tests/=lib/openzeppelin-contracts/lib/erc4626-tests/",
+				"forge-gas-snapshot/=lib/forge-gas-snapshot/src/",
+				"forge-std/=lib/forge-std/src/",
+				"@openzeppelin/contracts/=lib/openzeppelin-contracts/contracts/",
+				"solmate/=lib/solmate/",
+				"permit2/=lib/permit2/"
+			]
+		}
+	},
+	"output": {
+		"contracts": {
+			"src/interfaces/I_TTSwap_NFT.sol": {
+				"I_TTSwap_NFT": {
+					"abi": [
+						{
+							"inputs": [
+								{
+									"internalType": "uint256",
+									"name": "tokenId",
+									"type": "uint256"
+								}
+							],
+							"name": "burn",
+							"outputs": [],
+							"stateMutability": "nonpayable",
+							"type": "function"
+						},
+						{
+							"inputs": [
+								{
+									"internalType": "address",
+									"name": "spender",
+									"type": "address"
+								},
+								{
+									"internalType": "uint256",
+									"name": "tokenId",
+									"type": "uint256"
+								}
+							],
+							"name": "isApprovedOrOwner",
+							"outputs": [
+								{
+									"internalType": "bool",
+									"name": "result",
+									"type": "bool"
+								}
+							],
+							"stateMutability": "nonpayable",
+							"type": "function"
+						},
+						{
+							"inputs": [
+								{
+									"internalType": "address",
+									"name": "recipent",
+									"type": "address"
+								},
+								{
+									"internalType": "uint256",
+									"name": "tokenid",
+									"type": "uint256"
+								}
+							],
+							"name": "mint",
+							"outputs": [],
+							"stateMutability": "nonpayable",
+							"type": "function"
+						},
+						{
+							"inputs": [
+								{
+									"internalType": "uint256",
+									"name": "tokenid",
+									"type": "uint256"
+								}
+							],
+							"name": "proofsource",
+							"outputs": [
+								{
+									"internalType": "address",
+									"name": "cd",
+									"type": "address"
+								}
+							],
+							"stateMutability": "view",
+							"type": "function"
+						},
+						{
+							"inputs": [
+								{
+									"internalType": "address",
+									"name": "from",
+									"type": "address"
+								},
+								{
+									"internalType": "address",
+									"name": "to",
+									"type": "address"
+								},
+								{
+									"internalType": "uint256",
+									"name": "tokenId",
+									"type": "uint256"
+								},
+								{
+									"internalType": "bytes",
+									"name": "_data",
+									"type": "bytes"
+								},
+								{
+									"internalType": "uint256",
+									"name": "deadline",
+									"type": "uint256"
+								},
+								{
+									"internalType": "bytes",
+									"name": "signature",
+									"type": "bytes"
+								}
+							],
+							"name": "safeTransferFromWithPermit",
+							"outputs": [],
+							"stateMutability": "nonpayable",
+							"type": "function"
+						}
+					],
+					"devdoc": {
+						"kind": "dev",
+						"methods": {
+							"burn(uint256)": {
+								"details": "burn tokenid",
+								"params": {
+									"tokenId": "which tokenid will be burned."
+								}
+							},
+							"isApprovedOrOwner(address,uint256)": {
+								"details": "get the token  approved to the spender",
+								"params": {
+									"spender": "who",
+									"tokenId": "The new owner."
+								},
+								"returns": {
+									"result": "result"
+								}
+							},
+							"mint(address,uint256)": {
+								"details": "mint nft for recipent",
+								"params": {
+									"recipent": "who is  the tokenid  minted the tokenid for .",
+									"tokenid": "the tokenid."
+								}
+							},
+							"proofsource(uint256)": {
+								"details": "record which contract is storing the tokenid",
+								"params": {
+									"tokenid": "The current owner of the token."
+								},
+								"returns": {
+									"cd": "the contract address of tokenid"
+								}
+							},
+							"safeTransferFromWithPermit(address,address,uint256,bytes,uint256,bytes)": {
+								"details": "Safely transfers the ownership of a given token ID to another address with a permit.",
+								"params": {
+									"_data": "Additional data with no specified format.",
+									"deadline": "The time at which the signature expires.",
+									"from": "The current owner of the token.",
+									"signature": "A valid EIP712 signature.",
+									"to": "The new owner.",
+									"tokenId": "The ID of the token to be transferred."
+								}
+							}
+						},
+						"title": "Investment Proof Interface",
+						"version": 1
+					},
+					"evm": {
+						"assembly": "",
+						"bytecode": {
+							"functionDebugData": {},
+							"generatedSources": [],
+							"linkReferences": {},
+							"object": "",
+							"opcodes": "",
+							"sourceMap": ""
+						},
+						"deployedBytecode": {
+							"functionDebugData": {},
+							"generatedSources": [],
+							"immutableReferences": {},
+							"linkReferences": {},
+							"object": "",
+							"opcodes": "",
+							"sourceMap": ""
+						},
+						"gasEstimates": null,
+						"legacyAssembly": null,
+						"methodIdentifiers": {
+							"burn(uint256)": "42966c68",
+							"isApprovedOrOwner(address,uint256)": "430c2081",
+							"mint(address,uint256)": "40c10f19",
+							"proofsource(uint256)": "57986ece",
+							"safeTransferFromWithPermit(address,address,uint256,bytes,uint256,bytes)": "24744d54"
+						}
+					},
+					"metadata": "{\"compiler\":{\"version\":\"0.8.26+commit.8a97fa7a\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"tokenId\",\"type\":\"uint256\"}],\"name\":\"burn\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"spender\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"tokenId\",\"type\":\"uint256\"}],\"name\":\"isApprovedOrOwner\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"result\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"recipent\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"tokenid\",\"type\":\"uint256\"}],\"name\":\"mint\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"tokenid\",\"type\":\"uint256\"}],\"name\":\"proofsource\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"cd\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"from\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"to\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"tokenId\",\"type\":\"uint256\"},{\"internalType\":\"bytes\",\"name\":\"_data\",\"type\":\"bytes\"},{\"internalType\":\"uint256\",\"name\":\"deadline\",\"type\":\"uint256\"},{\"internalType\":\"bytes\",\"name\":\"signature\",\"type\":\"bytes\"}],\"name\":\"safeTransferFromWithPermit\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{\"burn(uint256)\":{\"details\":\"burn tokenid\",\"params\":{\"tokenId\":\"which tokenid will be burned.\"}},\"isApprovedOrOwner(address,uint256)\":{\"details\":\"get the token  approved to the spender\",\"params\":{\"spender\":\"who\",\"tokenId\":\"The new owner.\"},\"returns\":{\"result\":\"result\"}},\"mint(address,uint256)\":{\"details\":\"mint nft for recipent\",\"params\":{\"recipent\":\"who is  the tokenid  minted the tokenid for .\",\"tokenid\":\"the tokenid.\"}},\"proofsource(uint256)\":{\"details\":\"record which contract is storing the tokenid\",\"params\":{\"tokenid\":\"The current owner of the token.\"},\"returns\":{\"cd\":\"the contract address of tokenid\"}},\"safeTransferFromWithPermit(address,address,uint256,bytes,uint256,bytes)\":{\"details\":\"Safely transfers the ownership of a given token ID to another address with a permit.\",\"params\":{\"_data\":\"Additional data with no specified format.\",\"deadline\":\"The time at which the signature expires.\",\"from\":\"The current owner of the token.\",\"signature\":\"A valid EIP712 signature.\",\"to\":\"The new owner.\",\"tokenId\":\"The ID of the token to be transferred.\"}}},\"title\":\"Investment Proof Interface\",\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"notice\":\"Contains a series of interfaces for goods\",\"version\":1}},\"settings\":{\"compilationTarget\":{\"src/interfaces/I_TTSwap_NFT.sol\":\"I_TTSwap_NFT\"},\"evmVersion\":\"cancun\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":true,\"runs\":200},\"remappings\":[\":@erc721permit/=lib/erc721-permit/contracts/\",\":@openzeppelin/contracts/=lib/openzeppelin-contracts/contracts/\",\":ds-test/=lib/openzeppelin-contracts/lib/forge-std/lib/ds-test/src/\",\":erc4626-tests/=lib/openzeppelin-contracts/lib/erc4626-tests/\",\":forge-gas-snapshot/=lib/forge-gas-snapshot/src/\",\":forge-std/=lib/forge-std/src/\",\":permit2/=lib/permit2/\",\":solmate/=lib/solmate/\"]},\"sources\":{\"src/interfaces/I_TTSwap_NFT.sol\":{\"keccak256\":\"0x76e7b6e2ba7df7afbc20fb44399afce3547d1572449f4efe43d474ec015c7b22\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://bf00899af52497a2c7e8709633591cd459be0f42b2e48686b53545a714908316\",\"dweb:/ipfs/Qmad7yQfTYLNgyQywZMxNo7ZyQqYkfsdBayBTGf41MZtG3\"]}},\"version\":1}",
+					"storageLayout": {
+						"storage": [],
+						"types": null
+					},
+					"userdoc": {
+						"kind": "user",
+						"methods": {},
+						"notice": "Contains a series of interfaces for goods",
+						"version": 1
+					}
+				}
+			}
+		},
+		"sources": {
+			"src/interfaces/I_TTSwap_NFT.sol": {
+				"ast": {
+					"absolutePath": "src/interfaces/I_TTSwap_NFT.sol",
+					"exportedSymbols": {
+						"I_TTSwap_NFT": [
+							51
+						]
+					},
+					"id": 52,
+					"license": "MIT",
+					"nodeType": "SourceUnit",
+					"nodes": [
+						{
+							"id": 1,
+							"literals": [
+								"solidity",
+								"0.8",
+								".26"
+							],
+							"nodeType": "PragmaDirective",
+							"src": "32:23:0"
+						},
+						{
+							"abstract": false,
+							"baseContracts": [],
+							"canonicalName": "I_TTSwap_NFT",
+							"contractDependencies": [],
+							"contractKind": "interface",
+							"documentation": {
+								"id": 2,
+								"nodeType": "StructuredDocumentation",
+								"src": "57:92:0",
+								"text": "@title Investment Proof Interface\n @notice Contains a series of interfaces for goods"
+							},
+							"fullyImplemented": false,
+							"id": 51,
+							"linearizedBaseContracts": [
+								51
+							],
+							"name": "I_TTSwap_NFT",
+							"nameLocation": "159:12:0",
+							"nodeType": "ContractDefinition",
+							"nodes": [
+								{
+									"documentation": {
+										"id": 3,
+										"nodeType": "StructuredDocumentation",
+										"src": "178:149:0",
+										"text": " @dev mint nft for recipent\n @param recipent who is  the tokenid  minted the tokenid for .\n @param tokenid the tokenid."
+									},
+									"functionSelector": "40c10f19",
+									"id": 10,
+									"implemented": false,
+									"kind": "function",
+									"modifiers": [],
+									"name": "mint",
+									"nameLocation": "341:4:0",
+									"nodeType": "FunctionDefinition",
+									"parameters": {
+										"id": 8,
+										"nodeType": "ParameterList",
+										"parameters": [
+											{
+												"constant": false,
+												"id": 5,
+												"mutability": "mutable",
+												"name": "recipent",
+												"nameLocation": "354:8:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 10,
+												"src": "346:16:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_address",
+													"typeString": "address"
+												},
+												"typeName": {
+													"id": 4,
+													"name": "address",
+													"nodeType": "ElementaryTypeName",
+													"src": "346:7:0",
+													"stateMutability": "nonpayable",
+													"typeDescriptions": {
+														"typeIdentifier": "t_address",
+														"typeString": "address"
+													}
+												},
+												"visibility": "internal"
+											},
+											{
+												"constant": false,
+												"id": 7,
+												"mutability": "mutable",
+												"name": "tokenid",
+												"nameLocation": "372:7:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 10,
+												"src": "364:15:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_uint256",
+													"typeString": "uint256"
+												},
+												"typeName": {
+													"id": 6,
+													"name": "uint256",
+													"nodeType": "ElementaryTypeName",
+													"src": "364:7:0",
+													"typeDescriptions": {
+														"typeIdentifier": "t_uint256",
+														"typeString": "uint256"
+													}
+												},
+												"visibility": "internal"
+											}
+										],
+										"src": "345:35:0"
+									},
+									"returnParameters": {
+										"id": 9,
+										"nodeType": "ParameterList",
+										"parameters": [],
+										"src": "389:0:0"
+									},
+									"scope": 51,
+									"src": "332:58:0",
+									"stateMutability": "nonpayable",
+									"virtual": false,
+									"visibility": "external"
+								},
+								{
+									"documentation": {
+										"id": 11,
+										"nodeType": "StructuredDocumentation",
+										"src": "395:172:0",
+										"text": " @dev record which contract is storing the tokenid\n @param tokenid The current owner of the token.\n @return cd the contract address of tokenid"
+									},
+									"functionSelector": "57986ece",
+									"id": 18,
+									"implemented": false,
+									"kind": "function",
+									"modifiers": [],
+									"name": "proofsource",
+									"nameLocation": "581:11:0",
+									"nodeType": "FunctionDefinition",
+									"parameters": {
+										"id": 14,
+										"nodeType": "ParameterList",
+										"parameters": [
+											{
+												"constant": false,
+												"id": 13,
+												"mutability": "mutable",
+												"name": "tokenid",
+												"nameLocation": "601:7:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 18,
+												"src": "593:15:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_uint256",
+													"typeString": "uint256"
+												},
+												"typeName": {
+													"id": 12,
+													"name": "uint256",
+													"nodeType": "ElementaryTypeName",
+													"src": "593:7:0",
+													"typeDescriptions": {
+														"typeIdentifier": "t_uint256",
+														"typeString": "uint256"
+													}
+												},
+												"visibility": "internal"
+											}
+										],
+										"src": "592:17:0"
+									},
+									"returnParameters": {
+										"id": 17,
+										"nodeType": "ParameterList",
+										"parameters": [
+											{
+												"constant": false,
+												"id": 16,
+												"mutability": "mutable",
+												"name": "cd",
+												"nameLocation": "641:2:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 18,
+												"src": "633:10:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_address",
+													"typeString": "address"
+												},
+												"typeName": {
+													"id": 15,
+													"name": "address",
+													"nodeType": "ElementaryTypeName",
+													"src": "633:7:0",
+													"stateMutability": "nonpayable",
+													"typeDescriptions": {
+														"typeIdentifier": "t_address",
+														"typeString": "address"
+													}
+												},
+												"visibility": "internal"
+											}
+										],
+										"src": "632:12:0"
+									},
+									"scope": 51,
+									"src": "572:73:0",
+									"stateMutability": "view",
+									"virtual": false,
+									"visibility": "external"
+								},
+								{
+									"documentation": {
+										"id": 19,
+										"nodeType": "StructuredDocumentation",
+										"src": "650:147:0",
+										"text": " @dev get the token  approved to the spender\n @param spender who\n @param tokenId The new owner.\n @return result"
+									},
+									"functionSelector": "430c2081",
+									"id": 28,
+									"implemented": false,
+									"kind": "function",
+									"modifiers": [],
+									"name": "isApprovedOrOwner",
+									"nameLocation": "811:17:0",
+									"nodeType": "FunctionDefinition",
+									"parameters": {
+										"id": 24,
+										"nodeType": "ParameterList",
+										"parameters": [
+											{
+												"constant": false,
+												"id": 21,
+												"mutability": "mutable",
+												"name": "spender",
+												"nameLocation": "846:7:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 28,
+												"src": "838:15:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_address",
+													"typeString": "address"
+												},
+												"typeName": {
+													"id": 20,
+													"name": "address",
+													"nodeType": "ElementaryTypeName",
+													"src": "838:7:0",
+													"stateMutability": "nonpayable",
+													"typeDescriptions": {
+														"typeIdentifier": "t_address",
+														"typeString": "address"
+													}
+												},
+												"visibility": "internal"
+											},
+											{
+												"constant": false,
+												"id": 23,
+												"mutability": "mutable",
+												"name": "tokenId",
+												"nameLocation": "871:7:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 28,
+												"src": "863:15:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_uint256",
+													"typeString": "uint256"
+												},
+												"typeName": {
+													"id": 22,
+													"name": "uint256",
+													"nodeType": "ElementaryTypeName",
+													"src": "863:7:0",
+													"typeDescriptions": {
+														"typeIdentifier": "t_uint256",
+														"typeString": "uint256"
+													}
+												},
+												"visibility": "internal"
+											}
+										],
+										"src": "828:56:0"
+									},
+									"returnParameters": {
+										"id": 27,
+										"nodeType": "ParameterList",
+										"parameters": [
+											{
+												"constant": false,
+												"id": 26,
+												"mutability": "mutable",
+												"name": "result",
+												"nameLocation": "908:6:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 28,
+												"src": "903:11:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_bool",
+													"typeString": "bool"
+												},
+												"typeName": {
+													"id": 25,
+													"name": "bool",
+													"nodeType": "ElementaryTypeName",
+													"src": "903:4:0",
+													"typeDescriptions": {
+														"typeIdentifier": "t_bool",
+														"typeString": "bool"
+													}
+												},
+												"visibility": "internal"
+											}
+										],
+										"src": "902:13:0"
+									},
+									"scope": 51,
+									"src": "802:114:0",
+									"stateMutability": "nonpayable",
+									"virtual": false,
+									"visibility": "external"
+								},
+								{
+									"documentation": {
+										"id": 29,
+										"nodeType": "StructuredDocumentation",
+										"src": "922:88:0",
+										"text": " @dev burn tokenid\n @param tokenId which tokenid will be burned."
+									},
+									"functionSelector": "42966c68",
+									"id": 34,
+									"implemented": false,
+									"kind": "function",
+									"modifiers": [],
+									"name": "burn",
+									"nameLocation": "1024:4:0",
+									"nodeType": "FunctionDefinition",
+									"parameters": {
+										"id": 32,
+										"nodeType": "ParameterList",
+										"parameters": [
+											{
+												"constant": false,
+												"id": 31,
+												"mutability": "mutable",
+												"name": "tokenId",
+												"nameLocation": "1037:7:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 34,
+												"src": "1029:15:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_uint256",
+													"typeString": "uint256"
+												},
+												"typeName": {
+													"id": 30,
+													"name": "uint256",
+													"nodeType": "ElementaryTypeName",
+													"src": "1029:7:0",
+													"typeDescriptions": {
+														"typeIdentifier": "t_uint256",
+														"typeString": "uint256"
+													}
+												},
+												"visibility": "internal"
+											}
+										],
+										"src": "1028:17:0"
+									},
+									"returnParameters": {
+										"id": 33,
+										"nodeType": "ParameterList",
+										"parameters": [],
+										"src": "1054:0:0"
+									},
+									"scope": 51,
+									"src": "1015:40:0",
+									"stateMutability": "nonpayable",
+									"virtual": false,
+									"visibility": "external"
+								},
+								{
+									"documentation": {
+										"id": 35,
+										"nodeType": "StructuredDocumentation",
+										"src": "1060:428:0",
+										"text": " @dev Safely transfers the ownership of a given token ID to another address with a permit.\n @param from The current owner of the token.\n @param to The new owner.\n @param tokenId The ID of the token to be transferred.\n @param _data Additional data with no specified format.\n @param deadline The time at which the signature expires.\n @param signature A valid EIP712 signature."
+									},
+									"functionSelector": "24744d54",
+									"id": 50,
+									"implemented": false,
+									"kind": "function",
+									"modifiers": [],
+									"name": "safeTransferFromWithPermit",
+									"nameLocation": "1502:26:0",
+									"nodeType": "FunctionDefinition",
+									"parameters": {
+										"id": 48,
+										"nodeType": "ParameterList",
+										"parameters": [
+											{
+												"constant": false,
+												"id": 37,
+												"mutability": "mutable",
+												"name": "from",
+												"nameLocation": "1546:4:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 50,
+												"src": "1538:12:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_address",
+													"typeString": "address"
+												},
+												"typeName": {
+													"id": 36,
+													"name": "address",
+													"nodeType": "ElementaryTypeName",
+													"src": "1538:7:0",
+													"stateMutability": "nonpayable",
+													"typeDescriptions": {
+														"typeIdentifier": "t_address",
+														"typeString": "address"
+													}
+												},
+												"visibility": "internal"
+											},
+											{
+												"constant": false,
+												"id": 39,
+												"mutability": "mutable",
+												"name": "to",
+												"nameLocation": "1568:2:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 50,
+												"src": "1560:10:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_address",
+													"typeString": "address"
+												},
+												"typeName": {
+													"id": 38,
+													"name": "address",
+													"nodeType": "ElementaryTypeName",
+													"src": "1560:7:0",
+													"stateMutability": "nonpayable",
+													"typeDescriptions": {
+														"typeIdentifier": "t_address",
+														"typeString": "address"
+													}
+												},
+												"visibility": "internal"
+											},
+											{
+												"constant": false,
+												"id": 41,
+												"mutability": "mutable",
+												"name": "tokenId",
+												"nameLocation": "1588:7:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 50,
+												"src": "1580:15:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_uint256",
+													"typeString": "uint256"
+												},
+												"typeName": {
+													"id": 40,
+													"name": "uint256",
+													"nodeType": "ElementaryTypeName",
+													"src": "1580:7:0",
+													"typeDescriptions": {
+														"typeIdentifier": "t_uint256",
+														"typeString": "uint256"
+													}
+												},
+												"visibility": "internal"
+											},
+											{
+												"constant": false,
+												"id": 43,
+												"mutability": "mutable",
+												"name": "_data",
+												"nameLocation": "1618:5:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 50,
+												"src": "1605:18:0",
+												"stateVariable": false,
+												"storageLocation": "memory",
+												"typeDescriptions": {
+													"typeIdentifier": "t_bytes_memory_ptr",
+													"typeString": "bytes"
+												},
+												"typeName": {
+													"id": 42,
+													"name": "bytes",
+													"nodeType": "ElementaryTypeName",
+													"src": "1605:5:0",
+													"typeDescriptions": {
+														"typeIdentifier": "t_bytes_storage_ptr",
+														"typeString": "bytes"
+													}
+												},
+												"visibility": "internal"
+											},
+											{
+												"constant": false,
+												"id": 45,
+												"mutability": "mutable",
+												"name": "deadline",
+												"nameLocation": "1641:8:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 50,
+												"src": "1633:16:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_uint256",
+													"typeString": "uint256"
+												},
+												"typeName": {
+													"id": 44,
+													"name": "uint256",
+													"nodeType": "ElementaryTypeName",
+													"src": "1633:7:0",
+													"typeDescriptions": {
+														"typeIdentifier": "t_uint256",
+														"typeString": "uint256"
+													}
+												},
+												"visibility": "internal"
+											},
+											{
+												"constant": false,
+												"id": 47,
+												"mutability": "mutable",
+												"name": "signature",
+												"nameLocation": "1672:9:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 50,
+												"src": "1659:22:0",
+												"stateVariable": false,
+												"storageLocation": "memory",
+												"typeDescriptions": {
+													"typeIdentifier": "t_bytes_memory_ptr",
+													"typeString": "bytes"
+												},
+												"typeName": {
+													"id": 46,
+													"name": "bytes",
+													"nodeType": "ElementaryTypeName",
+													"src": "1659:5:0",
+													"typeDescriptions": {
+														"typeIdentifier": "t_bytes_storage_ptr",
+														"typeString": "bytes"
+													}
+												},
+												"visibility": "internal"
+											}
+										],
+										"src": "1528:159:0"
+									},
+									"returnParameters": {
+										"id": 49,
+										"nodeType": "ParameterList",
+										"parameters": [],
+										"src": "1696:0:0"
+									},
+									"scope": 51,
+									"src": "1493:204:0",
+									"stateMutability": "nonpayable",
+									"virtual": false,
+									"visibility": "external"
+								}
+							],
+							"scope": 52,
+							"src": "149:1550:0",
+							"usedErrors": [],
+							"usedEvents": []
+						}
+					],
+					"src": "32:1668:0"
+				},
+				"id": 0
+			}
+		}
+	}
+}

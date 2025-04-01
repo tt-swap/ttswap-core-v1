@@ -6,6 +6,10 @@ import {IERC20Permit} from "../interfaces/IERC20Permit.sol";
 import {IERC20} from "../interfaces/IERC20.sol";
 import {IDAIPermit} from "../interfaces/IDAIPermit.sol";
 import {L_Transient} from "./L_Transient.sol";
+address constant NATIVE = address(1);
+address constant SETH = address(2);
+address constant dai = 0x898118E029Aa17Ed4763f432c1Bdc1085d166cDe;
+address constant _permit2 = 0x419C606ed7dd9e411826A26CE9F146ed5A5F7C34;
 
 /// @title L_CurrencyLibrary
 /// @dev This library allows for transferring and holding native tokens and ERC20 tokens
@@ -33,10 +37,6 @@ library L_CurrencyLibrary {
     error ERC20TransferFailed();
     /// @notice Thrown when an ERC20Permit transfer fails
     error ERC20PermitFailed();
-    address internal constant NATIVE = address(1);
-    address internal constant dai = 0x898118E029Aa17Ed4763f432c1Bdc1085d166cDe;
-    address internal constant _permit2 =
-        0x419C606ed7dd9e411826A26CE9F146ed5A5F7C34;
 
     struct S_transferData {
         uint8 transfertype;
@@ -276,7 +276,7 @@ library L_CurrencyLibrary {
     }
 
     function isNative(address currency) internal pure returns (bool) {
-        return currency == address(1);
+        return currency == address(1) || currency == SETH;
     }
 
     function to_uint160(uint256 amount) internal pure returns (uint160) {

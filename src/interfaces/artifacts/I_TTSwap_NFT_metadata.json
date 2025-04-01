@@ -1,0 +1,213 @@
+{
+	"compiler": {
+		"version": "0.8.26+commit.8a97fa7a"
+	},
+	"language": "Solidity",
+	"output": {
+		"abi": [
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "tokenId",
+						"type": "uint256"
+					}
+				],
+				"name": "burn",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "spender",
+						"type": "address"
+					},
+					{
+						"internalType": "uint256",
+						"name": "tokenId",
+						"type": "uint256"
+					}
+				],
+				"name": "isApprovedOrOwner",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "result",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "recipent",
+						"type": "address"
+					},
+					{
+						"internalType": "uint256",
+						"name": "tokenid",
+						"type": "uint256"
+					}
+				],
+				"name": "mint",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "tokenid",
+						"type": "uint256"
+					}
+				],
+				"name": "proofsource",
+				"outputs": [
+					{
+						"internalType": "address",
+						"name": "cd",
+						"type": "address"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "from",
+						"type": "address"
+					},
+					{
+						"internalType": "address",
+						"name": "to",
+						"type": "address"
+					},
+					{
+						"internalType": "uint256",
+						"name": "tokenId",
+						"type": "uint256"
+					},
+					{
+						"internalType": "bytes",
+						"name": "_data",
+						"type": "bytes"
+					},
+					{
+						"internalType": "uint256",
+						"name": "deadline",
+						"type": "uint256"
+					},
+					{
+						"internalType": "bytes",
+						"name": "signature",
+						"type": "bytes"
+					}
+				],
+				"name": "safeTransferFromWithPermit",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			}
+		],
+		"devdoc": {
+			"kind": "dev",
+			"methods": {
+				"burn(uint256)": {
+					"details": "burn tokenid",
+					"params": {
+						"tokenId": "which tokenid will be burned."
+					}
+				},
+				"isApprovedOrOwner(address,uint256)": {
+					"details": "get the token  approved to the spender",
+					"params": {
+						"spender": "who",
+						"tokenId": "The new owner."
+					},
+					"returns": {
+						"result": "result"
+					}
+				},
+				"mint(address,uint256)": {
+					"details": "mint nft for recipent",
+					"params": {
+						"recipent": "who is  the tokenid  minted the tokenid for .",
+						"tokenid": "the tokenid."
+					}
+				},
+				"proofsource(uint256)": {
+					"details": "record which contract is storing the tokenid",
+					"params": {
+						"tokenid": "The current owner of the token."
+					},
+					"returns": {
+						"cd": "the contract address of tokenid"
+					}
+				},
+				"safeTransferFromWithPermit(address,address,uint256,bytes,uint256,bytes)": {
+					"details": "Safely transfers the ownership of a given token ID to another address with a permit.",
+					"params": {
+						"_data": "Additional data with no specified format.",
+						"deadline": "The time at which the signature expires.",
+						"from": "The current owner of the token.",
+						"signature": "A valid EIP712 signature.",
+						"to": "The new owner.",
+						"tokenId": "The ID of the token to be transferred."
+					}
+				}
+			},
+			"title": "Investment Proof Interface",
+			"version": 1
+		},
+		"userdoc": {
+			"kind": "user",
+			"methods": {},
+			"notice": "Contains a series of interfaces for goods",
+			"version": 1
+		}
+	},
+	"settings": {
+		"compilationTarget": {
+			"src/interfaces/I_TTSwap_NFT.sol": "I_TTSwap_NFT"
+		},
+		"evmVersion": "cancun",
+		"libraries": {},
+		"metadata": {
+			"bytecodeHash": "ipfs"
+		},
+		"optimizer": {
+			"enabled": true,
+			"runs": 200
+		},
+		"remappings": [
+			":@erc721permit/=lib/erc721-permit/contracts/",
+			":@openzeppelin/contracts/=lib/openzeppelin-contracts/contracts/",
+			":ds-test/=lib/openzeppelin-contracts/lib/forge-std/lib/ds-test/src/",
+			":erc4626-tests/=lib/openzeppelin-contracts/lib/erc4626-tests/",
+			":forge-gas-snapshot/=lib/forge-gas-snapshot/src/",
+			":forge-std/=lib/forge-std/src/",
+			":permit2/=lib/permit2/",
+			":solmate/=lib/solmate/"
+		]
+	},
+	"sources": {
+		"src/interfaces/I_TTSwap_NFT.sol": {
+			"keccak256": "0x76e7b6e2ba7df7afbc20fb44399afce3547d1572449f4efe43d474ec015c7b22",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://bf00899af52497a2c7e8709633591cd459be0f42b2e48686b53545a714908316",
+				"dweb:/ipfs/Qmad7yQfTYLNgyQywZMxNo7ZyQqYkfsdBayBTGf41MZtG3"
+			]
+		}
+	},
+	"version": 1
+}

@@ -1,0 +1,1104 @@
+{
+	"compiler": {
+		"version": "0.8.23+commit.f704f362"
+	},
+	"language": "Solidity",
+	"output": {
+		"abi": [
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": false,
+						"internalType": "address",
+						"name": "recipient",
+						"type": "address"
+					},
+					{
+						"indexed": false,
+						"internalType": "uint256",
+						"name": "leftamount",
+						"type": "uint256"
+					},
+					{
+						"indexed": false,
+						"internalType": "uint120",
+						"name": "metric",
+						"type": "uint120"
+					},
+					{
+						"indexed": false,
+						"internalType": "uint8",
+						"name": "chips",
+						"type": "uint8"
+					},
+					{
+						"indexed": false,
+						"internalType": "uint32",
+						"name": "index",
+						"type": "uint32"
+					}
+				],
+				"name": "e_addShare",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": false,
+						"internalType": "address",
+						"name": "auths",
+						"type": "address"
+					},
+					{
+						"indexed": false,
+						"internalType": "uint256",
+						"name": "priv",
+						"type": "uint256"
+					}
+				],
+				"name": "e_addauths",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": false,
+						"internalType": "address",
+						"name": "users",
+						"type": "address"
+					},
+					{
+						"indexed": false,
+						"internalType": "address",
+						"name": "referral",
+						"type": "address"
+					}
+				],
+				"name": "e_addreferral",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": false,
+						"internalType": "uint32",
+						"name": "index",
+						"type": "uint32"
+					}
+				],
+				"name": "e_burnShare",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": false,
+						"internalType": "uint256",
+						"name": "usdtamount",
+						"type": "uint256"
+					},
+					{
+						"indexed": false,
+						"internalType": "uint256",
+						"name": "ttsamount",
+						"type": "uint256"
+					}
+				],
+				"name": "e_publicsell",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": false,
+						"internalType": "address",
+						"name": "auths",
+						"type": "address"
+					}
+				],
+				"name": "e_rmauths",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": false,
+						"internalType": "address",
+						"name": "recipient",
+						"type": "address"
+					}
+				],
+				"name": "e_setdaoadmin",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": false,
+						"internalType": "address",
+						"name": "normalgoodid",
+						"type": "address"
+					},
+					{
+						"indexed": false,
+						"internalType": "address",
+						"name": "valuegoodid",
+						"type": "address"
+					},
+					{
+						"indexed": false,
+						"internalType": "address",
+						"name": "marketcontract",
+						"type": "address"
+					}
+				],
+				"name": "e_setenv",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": false,
+						"internalType": "uint128",
+						"name": "mintamount",
+						"type": "uint128"
+					},
+					{
+						"indexed": false,
+						"internalType": "uint32",
+						"name": "index",
+						"type": "uint32"
+					}
+				],
+				"name": "e_shareMint",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": false,
+						"internalType": "uint32",
+						"name": "chain",
+						"type": "uint32"
+					},
+					{
+						"indexed": false,
+						"internalType": "uint128",
+						"name": "poolasset",
+						"type": "uint128"
+					},
+					{
+						"indexed": false,
+						"internalType": "uint256",
+						"name": "proofstate",
+						"type": "uint256"
+					}
+				],
+				"name": "e_syncChainStake",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": false,
+						"internalType": "address",
+						"name": "recipient",
+						"type": "address"
+					},
+					{
+						"indexed": false,
+						"internalType": "uint256",
+						"name": "proofvalue",
+						"type": "uint256"
+					},
+					{
+						"indexed": false,
+						"internalType": "uint256",
+						"name": "unstakestate",
+						"type": "uint256"
+					},
+					{
+						"indexed": false,
+						"internalType": "uint256",
+						"name": "stakestate",
+						"type": "uint256"
+					},
+					{
+						"indexed": false,
+						"internalType": "uint256",
+						"name": "poolstate",
+						"type": "uint256"
+					}
+				],
+				"name": "e_unstake",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": false,
+						"internalType": "uint256",
+						"name": "poolstate",
+						"type": "uint256"
+					}
+				],
+				"name": "e_updatepool",
+				"type": "event"
+			},
+			{
+				"inputs": [
+					{
+						"components": [
+							{
+								"internalType": "address",
+								"name": "recipient",
+								"type": "address"
+							},
+							{
+								"internalType": "uint128",
+								"name": "leftamount",
+								"type": "uint128"
+							},
+							{
+								"internalType": "uint120",
+								"name": "metric",
+								"type": "uint120"
+							},
+							{
+								"internalType": "uint8",
+								"name": "chips",
+								"type": "uint8"
+							}
+						],
+						"internalType": "struct s_share",
+						"name": "_share",
+						"type": "tuple"
+					}
+				],
+				"name": "addShare",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "_auths",
+						"type": "address"
+					},
+					{
+						"internalType": "uint256",
+						"name": "_priv",
+						"type": "uint256"
+					}
+				],
+				"name": "addauths",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "user",
+						"type": "address"
+					},
+					{
+						"internalType": "address",
+						"name": "referral",
+						"type": "address"
+					}
+				],
+				"name": "addreferral",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "recipent",
+						"type": "address"
+					}
+				],
+				"name": "auths",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "_auth",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "account",
+						"type": "address"
+					},
+					{
+						"internalType": "uint256",
+						"name": "value",
+						"type": "uint256"
+					}
+				],
+				"name": "burn",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint8",
+						"name": "index",
+						"type": "uint8"
+					}
+				],
+				"name": "burnShare",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint32",
+						"name": "chainid",
+						"type": "uint32"
+					},
+					{
+						"internalType": "uint128",
+						"name": "asset",
+						"type": "uint128"
+					}
+				],
+				"name": "chain_deposit",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint32",
+						"name": "chainid",
+						"type": "uint32"
+					},
+					{
+						"internalType": "uint128",
+						"name": "asset",
+						"type": "uint128"
+					}
+				],
+				"name": "chain_withdraw",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "_recipient",
+						"type": "address"
+					}
+				],
+				"name": "changeDAOAdmin",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "dao_admin",
+				"outputs": [
+					{
+						"internalType": "address",
+						"name": "_dao_admin",
+						"type": "address"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "_customer",
+						"type": "address"
+					}
+				],
+				"name": "getreferralanddaoadmin",
+				"outputs": [
+					{
+						"internalType": "address",
+						"name": "dba_admin",
+						"type": "address"
+					},
+					{
+						"internalType": "address",
+						"name": "referral",
+						"type": "address"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "marketcontract",
+				"outputs": [
+					{
+						"internalType": "address",
+						"name": "_marketcontract",
+						"type": "address"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "normalgoodid",
+				"outputs": [
+					{
+						"internalType": "address",
+						"name": "_normalgoodid",
+						"type": "address"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "usdtamount",
+						"type": "uint256"
+					},
+					{
+						"internalType": "bytes",
+						"name": "data",
+						"type": "bytes"
+					}
+				],
+				"name": "public_Sell",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "publicsell",
+				"outputs": [
+					{
+						"internalType": "uint128",
+						"name": "_publicsell",
+						"type": "uint128"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "_recipent",
+						"type": "address"
+					}
+				],
+				"name": "referrals",
+				"outputs": [
+					{
+						"internalType": "address",
+						"name": "_referral",
+						"type": "address"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "_auths",
+						"type": "address"
+					}
+				],
+				"name": "rmauths",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "_normalgoodid",
+						"type": "address"
+					},
+					{
+						"internalType": "address",
+						"name": "_valuegoodid",
+						"type": "address"
+					},
+					{
+						"internalType": "address",
+						"name": "_marketcontract",
+						"type": "address"
+					}
+				],
+				"name": "setEnv",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint8",
+						"name": "index",
+						"type": "uint8"
+					}
+				],
+				"name": "shareMint",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "staker",
+						"type": "address"
+					},
+					{
+						"internalType": "uint128",
+						"name": "proofvalue",
+						"type": "uint128"
+					}
+				],
+				"name": "stake",
+				"outputs": [
+					{
+						"internalType": "uint128",
+						"name": "construct",
+						"type": "uint128"
+					}
+				],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint128",
+						"name": "asset",
+						"type": "uint128"
+					},
+					{
+						"internalType": "address",
+						"name": "recipient",
+						"type": "address"
+					}
+				],
+				"name": "subchainDeposit",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint128",
+						"name": "asset",
+						"type": "uint128"
+					},
+					{
+						"internalType": "address",
+						"name": "recipient",
+						"type": "address"
+					}
+				],
+				"name": "subchainWithdraw",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint32",
+						"name": "chainid",
+						"type": "uint32"
+					},
+					{
+						"internalType": "uint128",
+						"name": "chainvalue",
+						"type": "uint128"
+					}
+				],
+				"name": "syncChainStake",
+				"outputs": [
+					{
+						"internalType": "uint128",
+						"name": "poolasset",
+						"type": "uint128"
+					}
+				],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint128",
+						"name": "amount",
+						"type": "uint128"
+					}
+				],
+				"name": "syncPoolAsset",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "staker",
+						"type": "address"
+					},
+					{
+						"internalType": "uint128",
+						"name": "proofvalue",
+						"type": "uint128"
+					}
+				],
+				"name": "unstake",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "valuegoodid",
+				"outputs": [
+					{
+						"internalType": "address",
+						"name": "_valuegoodid",
+						"type": "address"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "amount",
+						"type": "uint256"
+					},
+					{
+						"internalType": "address",
+						"name": "recipent",
+						"type": "address"
+					}
+				],
+				"name": "withdrawPublicSell",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			}
+		],
+		"devdoc": {
+			"events": {
+				"e_addShare(address,uint256,uint120,uint8,uint32)": {
+					"params": {
+						"chips": "The number of chips",
+						"index": "The index of the minting operation",
+						"leftamount": "The remaining amount to be minted",
+						"metric": "The metric used for minting",
+						"recipient": "The address receiving the minted tokens"
+					}
+				},
+				"e_addauths(address,uint256)": {
+					"params": {
+						"auths": "The address being authorized",
+						"priv": "The privilege level being granted"
+					}
+				},
+				"e_addreferral(address,address)": {
+					"params": {
+						"referral": "The address of the referrer",
+						"users": "The address of the user"
+					}
+				},
+				"e_burnShare(uint32)": {
+					"params": {
+						"index": "The index of the minting operation being burned"
+					}
+				},
+				"e_publicsell(uint256,uint256)": {
+					"params": {
+						"ttsamount": "The amount of TTS involved",
+						"usdtamount": "The amount of USDT involved"
+					}
+				},
+				"e_rmauths(address)": {
+					"params": {
+						"auths": "The address being deauthorized"
+					}
+				},
+				"e_setdaoadmin(address)": {
+					"params": {
+						"recipient": "The address of the new DAO admin"
+					}
+				},
+				"e_setenv(address,address,address)": {
+					"params": {
+						"marketcontract": "The address of the market contract",
+						"normalgoodid": "The ID of the normal good",
+						"valuegoodid": "The ID of the value good"
+					}
+				},
+				"e_shareMint(uint128,uint32)": {
+					"params": {
+						"index": "The index of the minting operation",
+						"mintamount": "The amount being minted"
+					}
+				},
+				"e_syncChainStake(uint32,uint128,uint256)": {
+					"params": {
+						"chain": "The chain ID",
+						"poolasset": "The pool asset value",
+						"proofstate": "The value of the pool"
+					}
+				},
+				"e_unstake(address,uint256,uint256,uint256,uint256)": {
+					"params": {
+						"poolstate": "The state of the pool",
+						"proofvalue": "first 128 bit proofvalue,last 128 bit poolcontruct",
+						"recipient": "The address receiving the unstaked tokens",
+						"stakestate": "The state of the stake",
+						"unstakestate": "The state after unstaking"
+					}
+				},
+				"e_updatepool(uint256)": {
+					"params": {
+						"poolstate": "The new state of the pool"
+					}
+				}
+			},
+			"kind": "dev",
+			"methods": {
+				"addShare((address,uint128,uint120,uint8))": {
+					"details": "Adds a new mint share to the contract",
+					"params": {
+						"_share": "The share structure containing recipient, amount, metric, and chips"
+					}
+				},
+				"addauths(address,uint256)": {
+					"details": "Adds or updates authorization for an address",
+					"params": {
+						"_auths": "The address to authorize",
+						"_priv": "The privilege level to assign"
+					}
+				},
+				"addreferral(address,address)": {
+					"params": {
+						"referral": "The address of the referrer",
+						"user": "The address of the user being referred"
+					}
+				},
+				"auths(address)": {
+					"details": "Returns the authorization level for a given address",
+					"params": {
+						"recipent": "user's address"
+					},
+					"returns": {
+						"_auth": "Returns the authorization level"
+					}
+				},
+				"burn(address,uint256)": {
+					"details": "Burns the specified value of tokens from the given account",
+					"params": {
+						"account": "the given account",
+						"value": "the amount will be burned"
+					}
+				},
+				"burnShare(uint8)": {
+					"details": "Burns the share at the specified index",
+					"params": {
+						"index": "index of share"
+					}
+				},
+				"chain_deposit(uint32,uint128)": {
+					"details": "Deposit the specified asset from the subchain to the recipient",
+					"params": {
+						"asset": "the asset amount will be deposit",
+						"chainid": "the subchain id"
+					}
+				},
+				"chain_withdraw(uint32,uint128)": {
+					"details": "Withdraws the specified asset from the subchain to the recipient",
+					"params": {
+						"asset": "the asset amount will be withdraw",
+						"chainid": "the subchain id"
+					}
+				},
+				"changeDAOAdmin(address)": {
+					"details": "Changes the DAO admin to the specified recipient address",
+					"params": {
+						"_recipient": "user's address"
+					}
+				},
+				"dao_admin()": {
+					"details": "Returns the address of the DAO admin",
+					"returns": {
+						"_dao_admin": "Returns the address of the DAO admin"
+					}
+				},
+				"getreferralanddaoadmin(address)": {
+					"params": {
+						"_customer": "The address of the customer"
+					},
+					"returns": {
+						"dba_admin": "The address of the DAO admin",
+						"referral": "The address of the referrer"
+					}
+				},
+				"marketcontract()": {
+					"details": "Returns the address of the market contract",
+					"returns": {
+						"_marketcontract": "Returns the address of marketcontract"
+					}
+				},
+				"normalgoodid()": {
+					"details": "Returns the ID of the normal good",
+					"returns": {
+						"_normalgoodid": "Returns the id of normalgood"
+					}
+				},
+				"public_Sell(uint256,bytes)": {
+					"details": "how much cost to buy tts",
+					"params": {
+						"usdtamount": "usdt amount"
+					}
+				},
+				"publicsell()": {
+					"details": "Returns the amount of TTS available for public sale",
+					"returns": {
+						"_publicsell": "Returns the amount of TTS available for public sale"
+					}
+				},
+				"referrals(address)": {
+					"details": "Returns the referrer address for a given user",
+					"params": {
+						"_recipent": "user's address"
+					},
+					"returns": {
+						"_referral": "Returns the referrer address for a given user"
+					}
+				},
+				"rmauths(address)": {
+					"details": "Removes authorization from an address",
+					"params": {
+						"_auths": "The address to remove authorization from"
+					}
+				},
+				"shareMint(uint8)": {
+					"details": "Mints a share at the specified index",
+					"params": {
+						"index": "index of share"
+					}
+				},
+				"stake(address,uint128)": {
+					"params": {
+						"proofvalue": "The proof value for the stake",
+						"staker": "The address of the staker"
+					},
+					"returns": {
+						"construct": "The construct value after staking"
+					}
+				},
+				"subchainDeposit(uint128,address)": {
+					"details": "Deposits the specified asset to the subchain for the recipient",
+					"params": {
+						"asset": "the asset amount will be deposit",
+						"recipient": "the receiver"
+					}
+				},
+				"subchainWithdraw(uint128,address)": {
+					"details": "Withdraws the specified asset from the subchain to the recipient",
+					"params": {
+						"asset": "the asset amount will be withdraw",
+						"recipient": "the asset owner"
+					}
+				},
+				"syncChainStake(uint32,uint128)": {
+					"details": "Synchronizes the chain stake and returns the pool asset value",
+					"params": {
+						"chainid": "the chain's id",
+						"chainvalue": "the chain's stake value"
+					}
+				},
+				"syncPoolAsset(uint128)": {
+					"details": "Synchronizes the pool asset with the specified amount to the subchain in stakepool",
+					"params": {
+						"amount": "the  amount will be Synchronizes"
+					}
+				},
+				"unstake(address,uint128)": {
+					"params": {
+						"proofvalue": "The proof value for unstaking",
+						"staker": "The address of the staker"
+					}
+				},
+				"valuegoodid()": {
+					"details": "Returns the ID of the value good",
+					"returns": {
+						"_valuegoodid": "Returns the id of the valuegoodid"
+					}
+				},
+				"withdrawPublicSell(uint256,address)": {
+					"details": "Withdraws the specified amount from the public sale to the recipient",
+					"params": {
+						"amount": "admin tranfer public sell to another address",
+						"recipent": "user's address"
+					}
+				}
+			},
+			"title": "Investment Proof Interface",
+			"version": 1
+		},
+		"userdoc": {
+			"events": {
+				"e_addShare(address,uint256,uint120,uint8,uint32)": {
+					"notice": "Emitted when minting is added"
+				},
+				"e_addauths(address,uint256)": {
+					"notice": "Emitted when authorizations are added"
+				},
+				"e_addreferral(address,address)": {
+					"notice": "Emitted when a referral is added"
+				},
+				"e_burnShare(uint32)": {
+					"notice": "Emitted when minting is burned"
+				},
+				"e_publicsell(uint256,uint256)": {
+					"notice": "Emitted during a public sale"
+				},
+				"e_rmauths(address)": {
+					"notice": "Emitted when authorizations are removed"
+				},
+				"e_setdaoadmin(address)": {
+					"notice": "Emitted when a DAO admin is set"
+				},
+				"e_setenv(address,address,address)": {
+					"notice": "Emitted when environment variables are set"
+				},
+				"e_shareMint(uint128,uint32)": {
+					"notice": "Emitted when DAO minting occurs"
+				},
+				"e_syncChainStake(uint32,uint128,uint256)": {
+					"notice": "Emitted when chain stake is synchronized"
+				},
+				"e_unstake(address,uint256,uint256,uint256,uint256)": {
+					"notice": "Emitted when unstaking occurs"
+				},
+				"e_updatepool(uint256)": {
+					"notice": "Emitted when the pool state is updated"
+				}
+			},
+			"kind": "user",
+			"methods": {
+				"addShare((address,uint128,uint120,uint8))": {
+					"notice": "Only callable on the main chain by the DAO adminReduces the left_share by the amount in _shareIncrements the shares_index and adds the new share to the shares mappingEmits an e_addShare event with the share details"
+				},
+				"addauths(address,uint256)": {
+					"notice": "Only the DAO admin can call this function"
+				},
+				"addreferral(address,address)": {
+					"notice": "Add a referral relationship"
+				},
+				"getreferralanddaoadmin(address)": {
+					"notice": "Get the DAO admin and referral for a customer"
+				},
+				"rmauths(address)": {
+					"notice": "Only the DAO admin can call this function"
+				},
+				"stake(address,uint128)": {
+					"notice": "Stake tokens"
+				},
+				"unstake(address,uint128)": {
+					"notice": "Unstake tokens"
+				}
+			},
+			"notice": "Contains a series of interfaces for goods",
+			"version": 1
+		}
+	},
+	"settings": {
+		"compilationTarget": {
+			"src/interfaces/I_TTSwap_Token.sol": "I_TTSwap_Token"
+		},
+		"evmVersion": "shanghai",
+		"libraries": {},
+		"metadata": {
+			"bytecodeHash": "ipfs"
+		},
+		"optimizer": {
+			"enabled": true,
+			"runs": 100
+		},
+		"remappings": [
+			":@erc721permit/=lib/erc721-permit/contracts/",
+			":@openzeppelin/contracts/=lib/openzeppelin-contracts/contracts/",
+			":ds-test/=lib/forge-std/lib/ds-test/src/",
+			":ds-test/=lib/openzeppelin-contracts/lib/forge-std/lib/ds-test/src/",
+			":erc4626-tests/=lib/openzeppelin-contracts/lib/erc4626-tests/",
+			":forge-gas-snapshot/=lib/forge-gas-snapshot/src/",
+			":forge-std/=lib/forge-std/src/",
+			":permit2/=lib/permit2/",
+			":solmate/=lib/solmate/"
+		],
+		"viaIR": true
+	},
+	"sources": {
+		"src/interfaces/I_TTSwap_Token.sol": {
+			"keccak256": "0xfdeb5b46056868c866c24f36a58b3409389d2df4bb7569d55a7b017e919272c5",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://e308a2835dc7e30be096e9d7f833707bc791911b6bc1b21e23cc4b3edf61fdc6",
+				"dweb:/ipfs/QmXXSKCjBKYDjr8oANHowYzzBMXw2ZoNbwfZsRkJduKWa4"
+			]
+		}
+	},
+	"version": 1
+}

@@ -1,0 +1,4814 @@
+{
+	"id": "7922fe39e63ad482a6e7617452205634",
+	"_format": "hh-sol-build-info-1",
+	"solcVersion": "0.8.23",
+	"solcLongVersion": "0.8.23+commit.f704f362",
+	"input": {
+		"language": "Solidity",
+		"settings": {
+			"viaIR": true,
+			"optimizer": {
+				"enabled": true,
+				"runs": 100
+			},
+			"outputSelection": {
+				"*": {
+					"": [
+						"ast"
+					],
+					"*": [
+						"abi",
+						"metadata",
+						"devdoc",
+						"userdoc",
+						"storageLayout",
+						"evm.legacyAssembly",
+						"evm.bytecode",
+						"evm.deployedBytecode",
+						"evm.methodIdentifiers",
+						"evm.gasEstimates",
+						"evm.assembly"
+					]
+				}
+			},
+			"remappings": [
+				"ds-test/=lib/forge-std/lib/ds-test/src/",
+				"forge-std/=lib/forge-std/src/",
+				"@erc721permit/=lib/erc721-permit/contracts/",
+				"ds-test/=lib/openzeppelin-contracts/lib/forge-std/lib/ds-test/src/",
+				"erc4626-tests/=lib/openzeppelin-contracts/lib/erc4626-tests/",
+				"forge-gas-snapshot/=lib/forge-gas-snapshot/src/",
+				"forge-std/=lib/forge-std/src/",
+				"@openzeppelin/contracts/=lib/openzeppelin-contracts/contracts/",
+				"solmate/=lib/solmate/",
+				"permit2/=lib/permit2/"
+			]
+		},
+		"sources": {
+			"src/interfaces/I_TTSwap_Token.sol": {
+				"content": "// SPDX-License-Identifier: MIT\npragma solidity 0.8.23;\n\n/// @title Investment Proof Interface\n/// @notice Contains a series of interfaces for goods\ninterface I_TTSwap_Token {\n    /// @notice Emitted when a referral is added\n    /// @param users The address of the user\n    /// @param referral The address of the referrer\n    event e_addreferral(address users, address referral);\n\n    /// @notice Emitted when environment variables are set\n    /// @param normalgoodid The ID of the normal good\n    /// @param valuegoodid The ID of the value good\n    /// @param marketcontract The address of the market contract\n    event e_setenv(\n        address normalgoodid,\n        address valuegoodid,\n        address marketcontract\n    );\n\n    /// @notice Emitted when a DAO admin is set\n    /// @param recipient The address of the new DAO admin\n    event e_setdaoadmin(address recipient);\n\n    /// @notice Emitted when authorizations are added\n    /// @param auths The address being authorized\n    /// @param priv The privilege level being granted\n    event e_addauths(address auths, uint256 priv);\n\n    /// @notice Emitted when authorizations are removed\n    /// @param auths The address being deauthorized\n    event e_rmauths(address auths);\n\n    /// @notice Emitted when minting is added\n    /// @param recipient The address receiving the minted tokens\n    /// @param leftamount The remaining amount to be minted\n    /// @param metric The metric used for minting\n    /// @param chips The number of chips\n    /// @param index The index of the minting operation\n    event e_addShare(\n        address recipient,\n        uint256 leftamount,\n        uint120 metric,\n        uint8 chips,\n        uint32 index\n    );\n\n    /// @notice Emitted when minting is burned\n    /// @param index The index of the minting operation being burned\n    event e_burnShare(uint32 index);\n\n    /// @notice Emitted when DAO minting occurs\n    /// @param mintamount The amount being minted\n    /// @param index The index of the minting operation\n    event e_shareMint(uint128 mintamount, uint32 index);\n\n    /// @notice Emitted during a public sale\n    /// @param usdtamount The amount of USDT involved\n    /// @param ttsamount The amount of TTS involved\n    event e_publicsell(uint256 usdtamount, uint256 ttsamount);\n\n    /// @notice Emitted when chain stake is synchronized\n    /// @param chain The chain ID\n    /// @param poolasset The pool asset value\n    /// @param proofstate  The value of the pool\n    event e_syncChainStake(\n        uint32 chain,\n        uint128 poolasset,\n        uint256 proofstate //first 128 bit proofvalue,last 128 bit proofconstruct\n    );\n\n    /// @notice Emitted when unstaking occurs\n    /// @param recipient The address receiving the unstaked tokens\n    /// @param proofvalue first 128 bit proofvalue,last 128 bit poolcontruct\n    /// @param unstakestate The state after unstaking\n    /// @param stakestate The state of the stake\n    /// @param poolstate The state of the pool\n    event e_unstake(\n        address recipient,\n        uint256 proofvalue,\n        uint256 unstakestate,\n        uint256 stakestate,\n        uint256 poolstate\n    );\n    /// @notice Emitted when the pool state is updated\n    /// @param poolstate The new state of the pool\n    event e_updatepool(uint256 poolstate);\n    /**\n     * @dev  Returns the address of the DAO admin\n     * @return _dao_admin Returns the address of the DAO admin\n     */\n    function dao_admin() external view returns (address _dao_admin);\n    /**\n     * @dev  Returns the address of the market contract\n     * @return _marketcontract Returns the address of marketcontract\n     */\n    function marketcontract() external view returns (address _marketcontract);\n    /**\n     * @dev   Returns the ID of the normal good\n     * @return _normalgoodid Returns the id of normalgood\n     */\n    function normalgoodid() external view returns (address _normalgoodid);\n    /**\n     * @dev   Returns the ID of the value good\n     * @return _valuegoodid Returns the id of the valuegoodid\n     */\n    function valuegoodid() external view returns (address _valuegoodid);\n    /**\n     * @dev  Returns the amount of TTS available for public sale\n     * @return _publicsell Returns the amount of TTS available for public sale\n     */\n    function publicsell() external view returns (uint128 _publicsell);\n    /**\n     * @dev  Returns the referrer address for a given user\n     * @param _recipent user's address\n     * @return _referral Returns the referrer address for a given user\n     */\n    function referrals(\n        address _recipent\n    ) external view returns (address _referral);\n    /**\n     * @dev Returns the authorization level for a given address\n     * @param recipent user's address\n     * @return _auth Returns the authorization level\n     */\n    function auths(address recipent) external view returns (uint256 _auth);\n    function setEnv(\n        address _normalgoodid,\n        address _valuegoodid,\n        address _marketcontract\n    ) external; // Sets the environment variables for normal good ID, value good ID, and market contract address\n    /**\n     * @dev Changes the DAO admin to the specified recipient address\n     * @param _recipient user's address\n     */\n    function changeDAOAdmin(address _recipient) external;\n    /**\n     * @dev Adds a new mint share to the contract\n     * @param _share The share structure containing recipient, amount, metric, and chips\n     * @notice Only callable on the main chain by the DAO admin\n     * @notice Reduces the left_share by the amount in _share\n     * @notice Increments the shares_index and adds the new share to the shares mapping\n     * @notice Emits an e_addShare event with the share details\n     */\n    function addShare(s_share calldata _share) external;\n    /**\n     * @dev  Burns the share at the specified index\n     * @param index index of share\n     */\n    function burnShare(uint8 index) external;\n    /**\n     * @dev  Mints a share at the specified index\n     * @param index index of share\n     */\n    function shareMint(uint8 index) external;\n    /**\n     * @dev how much cost to buy tts\n     * @param usdtamount usdt amount\n     */\n    function public_Sell(uint256 usdtamount, bytes memory data) external;\n    /**\n     * @dev  Withdraws the specified amount from the public sale to the recipient\n     * @param amount admin tranfer public sell to another address\n     * @param recipent user's address\n     */\n    function withdrawPublicSell(uint256 amount, address recipent) external;\n    /**\n     * @dev  Synchronizes the chain stake and returns the pool asset value\n     * @param chainid  the chain's id\n     * @param chainvalue the chain's stake value\n     */\n    function syncChainStake(\n        uint32 chainid,\n        uint128 chainvalue\n    ) external returns (uint128 poolasset); //\n    /**\n     * @dev Synchronizes the pool asset with the specified amount to the subchain in stakepool\n     * @param amount the  amount will be Synchronizes\n     */\n    function syncPoolAsset(uint128 amount) external; // Synchronizes the pool asset with the specified amount\n    /**\n     * @dev Withdraws the specified asset from the subchain to the recipient\n     * @param chainid the subchain id\n     * @param asset the asset amount will be withdraw\n     */\n    function chain_withdraw(uint32 chainid, uint128 asset) external; // Withdraws the specified asset from the given chain\n    /**\n     * @dev Deposit the specified asset from the subchain to the recipient\n     * @param chainid the subchain id\n     * @param asset the asset amount will be deposit\n     */\n    function chain_deposit(uint32 chainid, uint128 asset) external; // Deposits the specified asset to the given chain\n    /**\n     * @dev Withdraws the specified asset from the subchain to the recipient\n     * @param asset the asset amount will be withdraw\n     * @param recipient the asset owner\n     */\n    function subchainWithdraw(uint128 asset, address recipient) external;\n    /**\n     * @dev Deposits the specified asset to the subchain for the recipient\n     * @param asset the asset amount will be deposit\n     * @param recipient the receiver\n     */\n    function subchainDeposit(uint128 asset, address recipient) external; //\n    /**\n     * @dev Burns the specified value of tokens from the given account\n     * @param account the given account\n     * @param value the amount will be burned\n     */\n    function burn(address account, uint256 value) external;\n\n    /**\n     * @dev Adds or updates authorization for an address\n     * @param _auths The address to authorize\n     * @param _priv The privilege level to assign\n     * @notice Only the DAO admin can call this function\n     */\n    function addauths(address _auths, uint256 _priv) external;\n    /**\n     * @dev Removes authorization from an address\n     * @param _auths The address to remove authorization from\n     * @notice Only the DAO admin can call this function\n     */\n    function rmauths(address _auths) external;\n    /// @notice Add a referral relationship\n    /// @param user The address of the user being referred\n    /// @param referral The address of the referrer\n    function addreferral(address user, address referral) external;\n\n    /// @notice Stake tokens\n    /// @param staker The address of the staker\n    /// @param proofvalue The proof value for the stake\n    /// @return construct The construct value after staking\n    function stake(\n        address staker,\n        uint128 proofvalue\n    ) external returns (uint128 construct);\n\n    /// @notice Unstake tokens\n    /// @param staker The address of the staker\n    /// @param proofvalue The proof value for unstaking\n    function unstake(address staker, uint128 proofvalue) external;\n\n    /// @notice Get the DAO admin and referral for a customer\n    /// @param _customer The address of the customer\n    /// @return dba_admin The address of the DAO admin\n    /// @return referral The address of the referrer\n    function getreferralanddaoadmin(\n        address _customer\n    ) external view returns (address dba_admin, address referral);\n}\nstruct s_share {\n    address recipient; //owner\n    uint128 leftamount; // unlock amount\n    uint120 metric; //last unlock's metric\n    uint8 chips; // define the share's chips, and every time unlock one chips\n}\n\nstruct s_chain {\n    uint256 asset; //128 shareasset&poolasset 128 poolasset\n    uint256 proofstate; //128 value 128 constructasset\n    address recipient;\n}\nstruct s_proof {\n    address fromcontract; // from which contract\n    uint256 proofstate; // stake's state  amount0 value 128 construct asset\n}\n"
+			}
+		}
+	},
+	"output": {
+		"contracts": {
+			"src/interfaces/I_TTSwap_Token.sol": {
+				"I_TTSwap_Token": {
+					"abi": [
+						{
+							"anonymous": false,
+							"inputs": [
+								{
+									"indexed": false,
+									"internalType": "address",
+									"name": "recipient",
+									"type": "address"
+								},
+								{
+									"indexed": false,
+									"internalType": "uint256",
+									"name": "leftamount",
+									"type": "uint256"
+								},
+								{
+									"indexed": false,
+									"internalType": "uint120",
+									"name": "metric",
+									"type": "uint120"
+								},
+								{
+									"indexed": false,
+									"internalType": "uint8",
+									"name": "chips",
+									"type": "uint8"
+								},
+								{
+									"indexed": false,
+									"internalType": "uint32",
+									"name": "index",
+									"type": "uint32"
+								}
+							],
+							"name": "e_addShare",
+							"type": "event"
+						},
+						{
+							"anonymous": false,
+							"inputs": [
+								{
+									"indexed": false,
+									"internalType": "address",
+									"name": "auths",
+									"type": "address"
+								},
+								{
+									"indexed": false,
+									"internalType": "uint256",
+									"name": "priv",
+									"type": "uint256"
+								}
+							],
+							"name": "e_addauths",
+							"type": "event"
+						},
+						{
+							"anonymous": false,
+							"inputs": [
+								{
+									"indexed": false,
+									"internalType": "address",
+									"name": "users",
+									"type": "address"
+								},
+								{
+									"indexed": false,
+									"internalType": "address",
+									"name": "referral",
+									"type": "address"
+								}
+							],
+							"name": "e_addreferral",
+							"type": "event"
+						},
+						{
+							"anonymous": false,
+							"inputs": [
+								{
+									"indexed": false,
+									"internalType": "uint32",
+									"name": "index",
+									"type": "uint32"
+								}
+							],
+							"name": "e_burnShare",
+							"type": "event"
+						},
+						{
+							"anonymous": false,
+							"inputs": [
+								{
+									"indexed": false,
+									"internalType": "uint256",
+									"name": "usdtamount",
+									"type": "uint256"
+								},
+								{
+									"indexed": false,
+									"internalType": "uint256",
+									"name": "ttsamount",
+									"type": "uint256"
+								}
+							],
+							"name": "e_publicsell",
+							"type": "event"
+						},
+						{
+							"anonymous": false,
+							"inputs": [
+								{
+									"indexed": false,
+									"internalType": "address",
+									"name": "auths",
+									"type": "address"
+								}
+							],
+							"name": "e_rmauths",
+							"type": "event"
+						},
+						{
+							"anonymous": false,
+							"inputs": [
+								{
+									"indexed": false,
+									"internalType": "address",
+									"name": "recipient",
+									"type": "address"
+								}
+							],
+							"name": "e_setdaoadmin",
+							"type": "event"
+						},
+						{
+							"anonymous": false,
+							"inputs": [
+								{
+									"indexed": false,
+									"internalType": "address",
+									"name": "normalgoodid",
+									"type": "address"
+								},
+								{
+									"indexed": false,
+									"internalType": "address",
+									"name": "valuegoodid",
+									"type": "address"
+								},
+								{
+									"indexed": false,
+									"internalType": "address",
+									"name": "marketcontract",
+									"type": "address"
+								}
+							],
+							"name": "e_setenv",
+							"type": "event"
+						},
+						{
+							"anonymous": false,
+							"inputs": [
+								{
+									"indexed": false,
+									"internalType": "uint128",
+									"name": "mintamount",
+									"type": "uint128"
+								},
+								{
+									"indexed": false,
+									"internalType": "uint32",
+									"name": "index",
+									"type": "uint32"
+								}
+							],
+							"name": "e_shareMint",
+							"type": "event"
+						},
+						{
+							"anonymous": false,
+							"inputs": [
+								{
+									"indexed": false,
+									"internalType": "uint32",
+									"name": "chain",
+									"type": "uint32"
+								},
+								{
+									"indexed": false,
+									"internalType": "uint128",
+									"name": "poolasset",
+									"type": "uint128"
+								},
+								{
+									"indexed": false,
+									"internalType": "uint256",
+									"name": "proofstate",
+									"type": "uint256"
+								}
+							],
+							"name": "e_syncChainStake",
+							"type": "event"
+						},
+						{
+							"anonymous": false,
+							"inputs": [
+								{
+									"indexed": false,
+									"internalType": "address",
+									"name": "recipient",
+									"type": "address"
+								},
+								{
+									"indexed": false,
+									"internalType": "uint256",
+									"name": "proofvalue",
+									"type": "uint256"
+								},
+								{
+									"indexed": false,
+									"internalType": "uint256",
+									"name": "unstakestate",
+									"type": "uint256"
+								},
+								{
+									"indexed": false,
+									"internalType": "uint256",
+									"name": "stakestate",
+									"type": "uint256"
+								},
+								{
+									"indexed": false,
+									"internalType": "uint256",
+									"name": "poolstate",
+									"type": "uint256"
+								}
+							],
+							"name": "e_unstake",
+							"type": "event"
+						},
+						{
+							"anonymous": false,
+							"inputs": [
+								{
+									"indexed": false,
+									"internalType": "uint256",
+									"name": "poolstate",
+									"type": "uint256"
+								}
+							],
+							"name": "e_updatepool",
+							"type": "event"
+						},
+						{
+							"inputs": [
+								{
+									"components": [
+										{
+											"internalType": "address",
+											"name": "recipient",
+											"type": "address"
+										},
+										{
+											"internalType": "uint128",
+											"name": "leftamount",
+											"type": "uint128"
+										},
+										{
+											"internalType": "uint120",
+											"name": "metric",
+											"type": "uint120"
+										},
+										{
+											"internalType": "uint8",
+											"name": "chips",
+											"type": "uint8"
+										}
+									],
+									"internalType": "struct s_share",
+									"name": "_share",
+									"type": "tuple"
+								}
+							],
+							"name": "addShare",
+							"outputs": [],
+							"stateMutability": "nonpayable",
+							"type": "function"
+						},
+						{
+							"inputs": [
+								{
+									"internalType": "address",
+									"name": "_auths",
+									"type": "address"
+								},
+								{
+									"internalType": "uint256",
+									"name": "_priv",
+									"type": "uint256"
+								}
+							],
+							"name": "addauths",
+							"outputs": [],
+							"stateMutability": "nonpayable",
+							"type": "function"
+						},
+						{
+							"inputs": [
+								{
+									"internalType": "address",
+									"name": "user",
+									"type": "address"
+								},
+								{
+									"internalType": "address",
+									"name": "referral",
+									"type": "address"
+								}
+							],
+							"name": "addreferral",
+							"outputs": [],
+							"stateMutability": "nonpayable",
+							"type": "function"
+						},
+						{
+							"inputs": [
+								{
+									"internalType": "address",
+									"name": "recipent",
+									"type": "address"
+								}
+							],
+							"name": "auths",
+							"outputs": [
+								{
+									"internalType": "uint256",
+									"name": "_auth",
+									"type": "uint256"
+								}
+							],
+							"stateMutability": "view",
+							"type": "function"
+						},
+						{
+							"inputs": [
+								{
+									"internalType": "address",
+									"name": "account",
+									"type": "address"
+								},
+								{
+									"internalType": "uint256",
+									"name": "value",
+									"type": "uint256"
+								}
+							],
+							"name": "burn",
+							"outputs": [],
+							"stateMutability": "nonpayable",
+							"type": "function"
+						},
+						{
+							"inputs": [
+								{
+									"internalType": "uint8",
+									"name": "index",
+									"type": "uint8"
+								}
+							],
+							"name": "burnShare",
+							"outputs": [],
+							"stateMutability": "nonpayable",
+							"type": "function"
+						},
+						{
+							"inputs": [
+								{
+									"internalType": "uint32",
+									"name": "chainid",
+									"type": "uint32"
+								},
+								{
+									"internalType": "uint128",
+									"name": "asset",
+									"type": "uint128"
+								}
+							],
+							"name": "chain_deposit",
+							"outputs": [],
+							"stateMutability": "nonpayable",
+							"type": "function"
+						},
+						{
+							"inputs": [
+								{
+									"internalType": "uint32",
+									"name": "chainid",
+									"type": "uint32"
+								},
+								{
+									"internalType": "uint128",
+									"name": "asset",
+									"type": "uint128"
+								}
+							],
+							"name": "chain_withdraw",
+							"outputs": [],
+							"stateMutability": "nonpayable",
+							"type": "function"
+						},
+						{
+							"inputs": [
+								{
+									"internalType": "address",
+									"name": "_recipient",
+									"type": "address"
+								}
+							],
+							"name": "changeDAOAdmin",
+							"outputs": [],
+							"stateMutability": "nonpayable",
+							"type": "function"
+						},
+						{
+							"inputs": [],
+							"name": "dao_admin",
+							"outputs": [
+								{
+									"internalType": "address",
+									"name": "_dao_admin",
+									"type": "address"
+								}
+							],
+							"stateMutability": "view",
+							"type": "function"
+						},
+						{
+							"inputs": [
+								{
+									"internalType": "address",
+									"name": "_customer",
+									"type": "address"
+								}
+							],
+							"name": "getreferralanddaoadmin",
+							"outputs": [
+								{
+									"internalType": "address",
+									"name": "dba_admin",
+									"type": "address"
+								},
+								{
+									"internalType": "address",
+									"name": "referral",
+									"type": "address"
+								}
+							],
+							"stateMutability": "view",
+							"type": "function"
+						},
+						{
+							"inputs": [],
+							"name": "marketcontract",
+							"outputs": [
+								{
+									"internalType": "address",
+									"name": "_marketcontract",
+									"type": "address"
+								}
+							],
+							"stateMutability": "view",
+							"type": "function"
+						},
+						{
+							"inputs": [],
+							"name": "normalgoodid",
+							"outputs": [
+								{
+									"internalType": "address",
+									"name": "_normalgoodid",
+									"type": "address"
+								}
+							],
+							"stateMutability": "view",
+							"type": "function"
+						},
+						{
+							"inputs": [
+								{
+									"internalType": "uint256",
+									"name": "usdtamount",
+									"type": "uint256"
+								},
+								{
+									"internalType": "bytes",
+									"name": "data",
+									"type": "bytes"
+								}
+							],
+							"name": "public_Sell",
+							"outputs": [],
+							"stateMutability": "nonpayable",
+							"type": "function"
+						},
+						{
+							"inputs": [],
+							"name": "publicsell",
+							"outputs": [
+								{
+									"internalType": "uint128",
+									"name": "_publicsell",
+									"type": "uint128"
+								}
+							],
+							"stateMutability": "view",
+							"type": "function"
+						},
+						{
+							"inputs": [
+								{
+									"internalType": "address",
+									"name": "_recipent",
+									"type": "address"
+								}
+							],
+							"name": "referrals",
+							"outputs": [
+								{
+									"internalType": "address",
+									"name": "_referral",
+									"type": "address"
+								}
+							],
+							"stateMutability": "view",
+							"type": "function"
+						},
+						{
+							"inputs": [
+								{
+									"internalType": "address",
+									"name": "_auths",
+									"type": "address"
+								}
+							],
+							"name": "rmauths",
+							"outputs": [],
+							"stateMutability": "nonpayable",
+							"type": "function"
+						},
+						{
+							"inputs": [
+								{
+									"internalType": "address",
+									"name": "_normalgoodid",
+									"type": "address"
+								},
+								{
+									"internalType": "address",
+									"name": "_valuegoodid",
+									"type": "address"
+								},
+								{
+									"internalType": "address",
+									"name": "_marketcontract",
+									"type": "address"
+								}
+							],
+							"name": "setEnv",
+							"outputs": [],
+							"stateMutability": "nonpayable",
+							"type": "function"
+						},
+						{
+							"inputs": [
+								{
+									"internalType": "uint8",
+									"name": "index",
+									"type": "uint8"
+								}
+							],
+							"name": "shareMint",
+							"outputs": [],
+							"stateMutability": "nonpayable",
+							"type": "function"
+						},
+						{
+							"inputs": [
+								{
+									"internalType": "address",
+									"name": "staker",
+									"type": "address"
+								},
+								{
+									"internalType": "uint128",
+									"name": "proofvalue",
+									"type": "uint128"
+								}
+							],
+							"name": "stake",
+							"outputs": [
+								{
+									"internalType": "uint128",
+									"name": "construct",
+									"type": "uint128"
+								}
+							],
+							"stateMutability": "nonpayable",
+							"type": "function"
+						},
+						{
+							"inputs": [
+								{
+									"internalType": "uint128",
+									"name": "asset",
+									"type": "uint128"
+								},
+								{
+									"internalType": "address",
+									"name": "recipient",
+									"type": "address"
+								}
+							],
+							"name": "subchainDeposit",
+							"outputs": [],
+							"stateMutability": "nonpayable",
+							"type": "function"
+						},
+						{
+							"inputs": [
+								{
+									"internalType": "uint128",
+									"name": "asset",
+									"type": "uint128"
+								},
+								{
+									"internalType": "address",
+									"name": "recipient",
+									"type": "address"
+								}
+							],
+							"name": "subchainWithdraw",
+							"outputs": [],
+							"stateMutability": "nonpayable",
+							"type": "function"
+						},
+						{
+							"inputs": [
+								{
+									"internalType": "uint32",
+									"name": "chainid",
+									"type": "uint32"
+								},
+								{
+									"internalType": "uint128",
+									"name": "chainvalue",
+									"type": "uint128"
+								}
+							],
+							"name": "syncChainStake",
+							"outputs": [
+								{
+									"internalType": "uint128",
+									"name": "poolasset",
+									"type": "uint128"
+								}
+							],
+							"stateMutability": "nonpayable",
+							"type": "function"
+						},
+						{
+							"inputs": [
+								{
+									"internalType": "uint128",
+									"name": "amount",
+									"type": "uint128"
+								}
+							],
+							"name": "syncPoolAsset",
+							"outputs": [],
+							"stateMutability": "nonpayable",
+							"type": "function"
+						},
+						{
+							"inputs": [
+								{
+									"internalType": "address",
+									"name": "staker",
+									"type": "address"
+								},
+								{
+									"internalType": "uint128",
+									"name": "proofvalue",
+									"type": "uint128"
+								}
+							],
+							"name": "unstake",
+							"outputs": [],
+							"stateMutability": "nonpayable",
+							"type": "function"
+						},
+						{
+							"inputs": [],
+							"name": "valuegoodid",
+							"outputs": [
+								{
+									"internalType": "address",
+									"name": "_valuegoodid",
+									"type": "address"
+								}
+							],
+							"stateMutability": "view",
+							"type": "function"
+						},
+						{
+							"inputs": [
+								{
+									"internalType": "uint256",
+									"name": "amount",
+									"type": "uint256"
+								},
+								{
+									"internalType": "address",
+									"name": "recipent",
+									"type": "address"
+								}
+							],
+							"name": "withdrawPublicSell",
+							"outputs": [],
+							"stateMutability": "nonpayable",
+							"type": "function"
+						}
+					],
+					"devdoc": {
+						"events": {
+							"e_addShare(address,uint256,uint120,uint8,uint32)": {
+								"params": {
+									"chips": "The number of chips",
+									"index": "The index of the minting operation",
+									"leftamount": "The remaining amount to be minted",
+									"metric": "The metric used for minting",
+									"recipient": "The address receiving the minted tokens"
+								}
+							},
+							"e_addauths(address,uint256)": {
+								"params": {
+									"auths": "The address being authorized",
+									"priv": "The privilege level being granted"
+								}
+							},
+							"e_addreferral(address,address)": {
+								"params": {
+									"referral": "The address of the referrer",
+									"users": "The address of the user"
+								}
+							},
+							"e_burnShare(uint32)": {
+								"params": {
+									"index": "The index of the minting operation being burned"
+								}
+							},
+							"e_publicsell(uint256,uint256)": {
+								"params": {
+									"ttsamount": "The amount of TTS involved",
+									"usdtamount": "The amount of USDT involved"
+								}
+							},
+							"e_rmauths(address)": {
+								"params": {
+									"auths": "The address being deauthorized"
+								}
+							},
+							"e_setdaoadmin(address)": {
+								"params": {
+									"recipient": "The address of the new DAO admin"
+								}
+							},
+							"e_setenv(address,address,address)": {
+								"params": {
+									"marketcontract": "The address of the market contract",
+									"normalgoodid": "The ID of the normal good",
+									"valuegoodid": "The ID of the value good"
+								}
+							},
+							"e_shareMint(uint128,uint32)": {
+								"params": {
+									"index": "The index of the minting operation",
+									"mintamount": "The amount being minted"
+								}
+							},
+							"e_syncChainStake(uint32,uint128,uint256)": {
+								"params": {
+									"chain": "The chain ID",
+									"poolasset": "The pool asset value",
+									"proofstate": "The value of the pool"
+								}
+							},
+							"e_unstake(address,uint256,uint256,uint256,uint256)": {
+								"params": {
+									"poolstate": "The state of the pool",
+									"proofvalue": "first 128 bit proofvalue,last 128 bit poolcontruct",
+									"recipient": "The address receiving the unstaked tokens",
+									"stakestate": "The state of the stake",
+									"unstakestate": "The state after unstaking"
+								}
+							},
+							"e_updatepool(uint256)": {
+								"params": {
+									"poolstate": "The new state of the pool"
+								}
+							}
+						},
+						"kind": "dev",
+						"methods": {
+							"addShare((address,uint128,uint120,uint8))": {
+								"details": "Adds a new mint share to the contract",
+								"params": {
+									"_share": "The share structure containing recipient, amount, metric, and chips"
+								}
+							},
+							"addauths(address,uint256)": {
+								"details": "Adds or updates authorization for an address",
+								"params": {
+									"_auths": "The address to authorize",
+									"_priv": "The privilege level to assign"
+								}
+							},
+							"addreferral(address,address)": {
+								"params": {
+									"referral": "The address of the referrer",
+									"user": "The address of the user being referred"
+								}
+							},
+							"auths(address)": {
+								"details": "Returns the authorization level for a given address",
+								"params": {
+									"recipent": "user's address"
+								},
+								"returns": {
+									"_auth": "Returns the authorization level"
+								}
+							},
+							"burn(address,uint256)": {
+								"details": "Burns the specified value of tokens from the given account",
+								"params": {
+									"account": "the given account",
+									"value": "the amount will be burned"
+								}
+							},
+							"burnShare(uint8)": {
+								"details": "Burns the share at the specified index",
+								"params": {
+									"index": "index of share"
+								}
+							},
+							"chain_deposit(uint32,uint128)": {
+								"details": "Deposit the specified asset from the subchain to the recipient",
+								"params": {
+									"asset": "the asset amount will be deposit",
+									"chainid": "the subchain id"
+								}
+							},
+							"chain_withdraw(uint32,uint128)": {
+								"details": "Withdraws the specified asset from the subchain to the recipient",
+								"params": {
+									"asset": "the asset amount will be withdraw",
+									"chainid": "the subchain id"
+								}
+							},
+							"changeDAOAdmin(address)": {
+								"details": "Changes the DAO admin to the specified recipient address",
+								"params": {
+									"_recipient": "user's address"
+								}
+							},
+							"dao_admin()": {
+								"details": "Returns the address of the DAO admin",
+								"returns": {
+									"_dao_admin": "Returns the address of the DAO admin"
+								}
+							},
+							"getreferralanddaoadmin(address)": {
+								"params": {
+									"_customer": "The address of the customer"
+								},
+								"returns": {
+									"dba_admin": "The address of the DAO admin",
+									"referral": "The address of the referrer"
+								}
+							},
+							"marketcontract()": {
+								"details": "Returns the address of the market contract",
+								"returns": {
+									"_marketcontract": "Returns the address of marketcontract"
+								}
+							},
+							"normalgoodid()": {
+								"details": "Returns the ID of the normal good",
+								"returns": {
+									"_normalgoodid": "Returns the id of normalgood"
+								}
+							},
+							"public_Sell(uint256,bytes)": {
+								"details": "how much cost to buy tts",
+								"params": {
+									"usdtamount": "usdt amount"
+								}
+							},
+							"publicsell()": {
+								"details": "Returns the amount of TTS available for public sale",
+								"returns": {
+									"_publicsell": "Returns the amount of TTS available for public sale"
+								}
+							},
+							"referrals(address)": {
+								"details": "Returns the referrer address for a given user",
+								"params": {
+									"_recipent": "user's address"
+								},
+								"returns": {
+									"_referral": "Returns the referrer address for a given user"
+								}
+							},
+							"rmauths(address)": {
+								"details": "Removes authorization from an address",
+								"params": {
+									"_auths": "The address to remove authorization from"
+								}
+							},
+							"shareMint(uint8)": {
+								"details": "Mints a share at the specified index",
+								"params": {
+									"index": "index of share"
+								}
+							},
+							"stake(address,uint128)": {
+								"params": {
+									"proofvalue": "The proof value for the stake",
+									"staker": "The address of the staker"
+								},
+								"returns": {
+									"construct": "The construct value after staking"
+								}
+							},
+							"subchainDeposit(uint128,address)": {
+								"details": "Deposits the specified asset to the subchain for the recipient",
+								"params": {
+									"asset": "the asset amount will be deposit",
+									"recipient": "the receiver"
+								}
+							},
+							"subchainWithdraw(uint128,address)": {
+								"details": "Withdraws the specified asset from the subchain to the recipient",
+								"params": {
+									"asset": "the asset amount will be withdraw",
+									"recipient": "the asset owner"
+								}
+							},
+							"syncChainStake(uint32,uint128)": {
+								"details": "Synchronizes the chain stake and returns the pool asset value",
+								"params": {
+									"chainid": "the chain's id",
+									"chainvalue": "the chain's stake value"
+								}
+							},
+							"syncPoolAsset(uint128)": {
+								"details": "Synchronizes the pool asset with the specified amount to the subchain in stakepool",
+								"params": {
+									"amount": "the  amount will be Synchronizes"
+								}
+							},
+							"unstake(address,uint128)": {
+								"params": {
+									"proofvalue": "The proof value for unstaking",
+									"staker": "The address of the staker"
+								}
+							},
+							"valuegoodid()": {
+								"details": "Returns the ID of the value good",
+								"returns": {
+									"_valuegoodid": "Returns the id of the valuegoodid"
+								}
+							},
+							"withdrawPublicSell(uint256,address)": {
+								"details": "Withdraws the specified amount from the public sale to the recipient",
+								"params": {
+									"amount": "admin tranfer public sell to another address",
+									"recipent": "user's address"
+								}
+							}
+						},
+						"title": "Investment Proof Interface",
+						"version": 1
+					},
+					"evm": {
+						"assembly": "",
+						"bytecode": {
+							"functionDebugData": {},
+							"generatedSources": [],
+							"linkReferences": {},
+							"object": "",
+							"opcodes": "",
+							"sourceMap": ""
+						},
+						"deployedBytecode": {
+							"functionDebugData": {},
+							"generatedSources": [],
+							"immutableReferences": {},
+							"linkReferences": {},
+							"object": "",
+							"opcodes": "",
+							"sourceMap": ""
+						},
+						"gasEstimates": null,
+						"legacyAssembly": null,
+						"methodIdentifiers": {
+							"addShare((address,uint128,uint120,uint8))": "3b107e21",
+							"addauths(address,uint256)": "542128dd",
+							"addreferral(address,address)": "eca93cce",
+							"auths(address)": "64e72dbd",
+							"burn(address,uint256)": "9dc29fac",
+							"burnShare(uint8)": "9241bda6",
+							"chain_deposit(uint32,uint128)": "01bddf1b",
+							"chain_withdraw(uint32,uint128)": "c3bb7fff",
+							"changeDAOAdmin(address)": "3cba316b",
+							"dao_admin()": "a538e6a9",
+							"getreferralanddaoadmin(address)": "b88e6d63",
+							"marketcontract()": "2bf960da",
+							"normalgoodid()": "02517e8b",
+							"public_Sell(uint256,bytes)": "3a3099bb",
+							"publicsell()": "de5712d4",
+							"referrals(address)": "9ca423b3",
+							"rmauths(address)": "69a5ac32",
+							"setEnv(address,address,address)": "fa82add5",
+							"shareMint(uint8)": "df876548",
+							"stake(address,uint128)": "19f8d5b4",
+							"subchainDeposit(uint128,address)": "cd993b11",
+							"subchainWithdraw(uint128,address)": "0a4273e6",
+							"syncChainStake(uint32,uint128)": "30fd6b29",
+							"syncPoolAsset(uint128)": "6c0deba1",
+							"unstake(address,uint128)": "7bd3ca35",
+							"valuegoodid()": "f35da462",
+							"withdrawPublicSell(uint256,address)": "e7b43e7d"
+						}
+					},
+					"metadata": "{\"compiler\":{\"version\":\"0.8.23+commit.f704f362\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"recipient\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"leftamount\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint120\",\"name\":\"metric\",\"type\":\"uint120\"},{\"indexed\":false,\"internalType\":\"uint8\",\"name\":\"chips\",\"type\":\"uint8\"},{\"indexed\":false,\"internalType\":\"uint32\",\"name\":\"index\",\"type\":\"uint32\"}],\"name\":\"e_addShare\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"auths\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"priv\",\"type\":\"uint256\"}],\"name\":\"e_addauths\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"users\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"address\",\"name\":\"referral\",\"type\":\"address\"}],\"name\":\"e_addreferral\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint32\",\"name\":\"index\",\"type\":\"uint32\"}],\"name\":\"e_burnShare\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"usdtamount\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"ttsamount\",\"type\":\"uint256\"}],\"name\":\"e_publicsell\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"auths\",\"type\":\"address\"}],\"name\":\"e_rmauths\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"recipient\",\"type\":\"address\"}],\"name\":\"e_setdaoadmin\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"normalgoodid\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"address\",\"name\":\"valuegoodid\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"address\",\"name\":\"marketcontract\",\"type\":\"address\"}],\"name\":\"e_setenv\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint128\",\"name\":\"mintamount\",\"type\":\"uint128\"},{\"indexed\":false,\"internalType\":\"uint32\",\"name\":\"index\",\"type\":\"uint32\"}],\"name\":\"e_shareMint\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint32\",\"name\":\"chain\",\"type\":\"uint32\"},{\"indexed\":false,\"internalType\":\"uint128\",\"name\":\"poolasset\",\"type\":\"uint128\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"proofstate\",\"type\":\"uint256\"}],\"name\":\"e_syncChainStake\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"recipient\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"proofvalue\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"unstakestate\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"stakestate\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"poolstate\",\"type\":\"uint256\"}],\"name\":\"e_unstake\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"poolstate\",\"type\":\"uint256\"}],\"name\":\"e_updatepool\",\"type\":\"event\"},{\"inputs\":[{\"components\":[{\"internalType\":\"address\",\"name\":\"recipient\",\"type\":\"address\"},{\"internalType\":\"uint128\",\"name\":\"leftamount\",\"type\":\"uint128\"},{\"internalType\":\"uint120\",\"name\":\"metric\",\"type\":\"uint120\"},{\"internalType\":\"uint8\",\"name\":\"chips\",\"type\":\"uint8\"}],\"internalType\":\"struct s_share\",\"name\":\"_share\",\"type\":\"tuple\"}],\"name\":\"addShare\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_auths\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"_priv\",\"type\":\"uint256\"}],\"name\":\"addauths\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"user\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"referral\",\"type\":\"address\"}],\"name\":\"addreferral\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"recipent\",\"type\":\"address\"}],\"name\":\"auths\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"_auth\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"account\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"value\",\"type\":\"uint256\"}],\"name\":\"burn\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint8\",\"name\":\"index\",\"type\":\"uint8\"}],\"name\":\"burnShare\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint32\",\"name\":\"chainid\",\"type\":\"uint32\"},{\"internalType\":\"uint128\",\"name\":\"asset\",\"type\":\"uint128\"}],\"name\":\"chain_deposit\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint32\",\"name\":\"chainid\",\"type\":\"uint32\"},{\"internalType\":\"uint128\",\"name\":\"asset\",\"type\":\"uint128\"}],\"name\":\"chain_withdraw\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_recipient\",\"type\":\"address\"}],\"name\":\"changeDAOAdmin\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"dao_admin\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"_dao_admin\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_customer\",\"type\":\"address\"}],\"name\":\"getreferralanddaoadmin\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"dba_admin\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"referral\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"marketcontract\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"_marketcontract\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"normalgoodid\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"_normalgoodid\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"usdtamount\",\"type\":\"uint256\"},{\"internalType\":\"bytes\",\"name\":\"data\",\"type\":\"bytes\"}],\"name\":\"public_Sell\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"publicsell\",\"outputs\":[{\"internalType\":\"uint128\",\"name\":\"_publicsell\",\"type\":\"uint128\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_recipent\",\"type\":\"address\"}],\"name\":\"referrals\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"_referral\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_auths\",\"type\":\"address\"}],\"name\":\"rmauths\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_normalgoodid\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"_valuegoodid\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"_marketcontract\",\"type\":\"address\"}],\"name\":\"setEnv\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint8\",\"name\":\"index\",\"type\":\"uint8\"}],\"name\":\"shareMint\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"staker\",\"type\":\"address\"},{\"internalType\":\"uint128\",\"name\":\"proofvalue\",\"type\":\"uint128\"}],\"name\":\"stake\",\"outputs\":[{\"internalType\":\"uint128\",\"name\":\"construct\",\"type\":\"uint128\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint128\",\"name\":\"asset\",\"type\":\"uint128\"},{\"internalType\":\"address\",\"name\":\"recipient\",\"type\":\"address\"}],\"name\":\"subchainDeposit\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint128\",\"name\":\"asset\",\"type\":\"uint128\"},{\"internalType\":\"address\",\"name\":\"recipient\",\"type\":\"address\"}],\"name\":\"subchainWithdraw\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint32\",\"name\":\"chainid\",\"type\":\"uint32\"},{\"internalType\":\"uint128\",\"name\":\"chainvalue\",\"type\":\"uint128\"}],\"name\":\"syncChainStake\",\"outputs\":[{\"internalType\":\"uint128\",\"name\":\"poolasset\",\"type\":\"uint128\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint128\",\"name\":\"amount\",\"type\":\"uint128\"}],\"name\":\"syncPoolAsset\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"staker\",\"type\":\"address\"},{\"internalType\":\"uint128\",\"name\":\"proofvalue\",\"type\":\"uint128\"}],\"name\":\"unstake\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"valuegoodid\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"_valuegoodid\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"},{\"internalType\":\"address\",\"name\":\"recipent\",\"type\":\"address\"}],\"name\":\"withdrawPublicSell\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}],\"devdoc\":{\"events\":{\"e_addShare(address,uint256,uint120,uint8,uint32)\":{\"params\":{\"chips\":\"The number of chips\",\"index\":\"The index of the minting operation\",\"leftamount\":\"The remaining amount to be minted\",\"metric\":\"The metric used for minting\",\"recipient\":\"The address receiving the minted tokens\"}},\"e_addauths(address,uint256)\":{\"params\":{\"auths\":\"The address being authorized\",\"priv\":\"The privilege level being granted\"}},\"e_addreferral(address,address)\":{\"params\":{\"referral\":\"The address of the referrer\",\"users\":\"The address of the user\"}},\"e_burnShare(uint32)\":{\"params\":{\"index\":\"The index of the minting operation being burned\"}},\"e_publicsell(uint256,uint256)\":{\"params\":{\"ttsamount\":\"The amount of TTS involved\",\"usdtamount\":\"The amount of USDT involved\"}},\"e_rmauths(address)\":{\"params\":{\"auths\":\"The address being deauthorized\"}},\"e_setdaoadmin(address)\":{\"params\":{\"recipient\":\"The address of the new DAO admin\"}},\"e_setenv(address,address,address)\":{\"params\":{\"marketcontract\":\"The address of the market contract\",\"normalgoodid\":\"The ID of the normal good\",\"valuegoodid\":\"The ID of the value good\"}},\"e_shareMint(uint128,uint32)\":{\"params\":{\"index\":\"The index of the minting operation\",\"mintamount\":\"The amount being minted\"}},\"e_syncChainStake(uint32,uint128,uint256)\":{\"params\":{\"chain\":\"The chain ID\",\"poolasset\":\"The pool asset value\",\"proofstate\":\"The value of the pool\"}},\"e_unstake(address,uint256,uint256,uint256,uint256)\":{\"params\":{\"poolstate\":\"The state of the pool\",\"proofvalue\":\"first 128 bit proofvalue,last 128 bit poolcontruct\",\"recipient\":\"The address receiving the unstaked tokens\",\"stakestate\":\"The state of the stake\",\"unstakestate\":\"The state after unstaking\"}},\"e_updatepool(uint256)\":{\"params\":{\"poolstate\":\"The new state of the pool\"}}},\"kind\":\"dev\",\"methods\":{\"addShare((address,uint128,uint120,uint8))\":{\"details\":\"Adds a new mint share to the contract\",\"params\":{\"_share\":\"The share structure containing recipient, amount, metric, and chips\"}},\"addauths(address,uint256)\":{\"details\":\"Adds or updates authorization for an address\",\"params\":{\"_auths\":\"The address to authorize\",\"_priv\":\"The privilege level to assign\"}},\"addreferral(address,address)\":{\"params\":{\"referral\":\"The address of the referrer\",\"user\":\"The address of the user being referred\"}},\"auths(address)\":{\"details\":\"Returns the authorization level for a given address\",\"params\":{\"recipent\":\"user's address\"},\"returns\":{\"_auth\":\"Returns the authorization level\"}},\"burn(address,uint256)\":{\"details\":\"Burns the specified value of tokens from the given account\",\"params\":{\"account\":\"the given account\",\"value\":\"the amount will be burned\"}},\"burnShare(uint8)\":{\"details\":\"Burns the share at the specified index\",\"params\":{\"index\":\"index of share\"}},\"chain_deposit(uint32,uint128)\":{\"details\":\"Deposit the specified asset from the subchain to the recipient\",\"params\":{\"asset\":\"the asset amount will be deposit\",\"chainid\":\"the subchain id\"}},\"chain_withdraw(uint32,uint128)\":{\"details\":\"Withdraws the specified asset from the subchain to the recipient\",\"params\":{\"asset\":\"the asset amount will be withdraw\",\"chainid\":\"the subchain id\"}},\"changeDAOAdmin(address)\":{\"details\":\"Changes the DAO admin to the specified recipient address\",\"params\":{\"_recipient\":\"user's address\"}},\"dao_admin()\":{\"details\":\"Returns the address of the DAO admin\",\"returns\":{\"_dao_admin\":\"Returns the address of the DAO admin\"}},\"getreferralanddaoadmin(address)\":{\"params\":{\"_customer\":\"The address of the customer\"},\"returns\":{\"dba_admin\":\"The address of the DAO admin\",\"referral\":\"The address of the referrer\"}},\"marketcontract()\":{\"details\":\"Returns the address of the market contract\",\"returns\":{\"_marketcontract\":\"Returns the address of marketcontract\"}},\"normalgoodid()\":{\"details\":\"Returns the ID of the normal good\",\"returns\":{\"_normalgoodid\":\"Returns the id of normalgood\"}},\"public_Sell(uint256,bytes)\":{\"details\":\"how much cost to buy tts\",\"params\":{\"usdtamount\":\"usdt amount\"}},\"publicsell()\":{\"details\":\"Returns the amount of TTS available for public sale\",\"returns\":{\"_publicsell\":\"Returns the amount of TTS available for public sale\"}},\"referrals(address)\":{\"details\":\"Returns the referrer address for a given user\",\"params\":{\"_recipent\":\"user's address\"},\"returns\":{\"_referral\":\"Returns the referrer address for a given user\"}},\"rmauths(address)\":{\"details\":\"Removes authorization from an address\",\"params\":{\"_auths\":\"The address to remove authorization from\"}},\"shareMint(uint8)\":{\"details\":\"Mints a share at the specified index\",\"params\":{\"index\":\"index of share\"}},\"stake(address,uint128)\":{\"params\":{\"proofvalue\":\"The proof value for the stake\",\"staker\":\"The address of the staker\"},\"returns\":{\"construct\":\"The construct value after staking\"}},\"subchainDeposit(uint128,address)\":{\"details\":\"Deposits the specified asset to the subchain for the recipient\",\"params\":{\"asset\":\"the asset amount will be deposit\",\"recipient\":\"the receiver\"}},\"subchainWithdraw(uint128,address)\":{\"details\":\"Withdraws the specified asset from the subchain to the recipient\",\"params\":{\"asset\":\"the asset amount will be withdraw\",\"recipient\":\"the asset owner\"}},\"syncChainStake(uint32,uint128)\":{\"details\":\"Synchronizes the chain stake and returns the pool asset value\",\"params\":{\"chainid\":\"the chain's id\",\"chainvalue\":\"the chain's stake value\"}},\"syncPoolAsset(uint128)\":{\"details\":\"Synchronizes the pool asset with the specified amount to the subchain in stakepool\",\"params\":{\"amount\":\"the  amount will be Synchronizes\"}},\"unstake(address,uint128)\":{\"params\":{\"proofvalue\":\"The proof value for unstaking\",\"staker\":\"The address of the staker\"}},\"valuegoodid()\":{\"details\":\"Returns the ID of the value good\",\"returns\":{\"_valuegoodid\":\"Returns the id of the valuegoodid\"}},\"withdrawPublicSell(uint256,address)\":{\"details\":\"Withdraws the specified amount from the public sale to the recipient\",\"params\":{\"amount\":\"admin tranfer public sell to another address\",\"recipent\":\"user's address\"}}},\"title\":\"Investment Proof Interface\",\"version\":1},\"userdoc\":{\"events\":{\"e_addShare(address,uint256,uint120,uint8,uint32)\":{\"notice\":\"Emitted when minting is added\"},\"e_addauths(address,uint256)\":{\"notice\":\"Emitted when authorizations are added\"},\"e_addreferral(address,address)\":{\"notice\":\"Emitted when a referral is added\"},\"e_burnShare(uint32)\":{\"notice\":\"Emitted when minting is burned\"},\"e_publicsell(uint256,uint256)\":{\"notice\":\"Emitted during a public sale\"},\"e_rmauths(address)\":{\"notice\":\"Emitted when authorizations are removed\"},\"e_setdaoadmin(address)\":{\"notice\":\"Emitted when a DAO admin is set\"},\"e_setenv(address,address,address)\":{\"notice\":\"Emitted when environment variables are set\"},\"e_shareMint(uint128,uint32)\":{\"notice\":\"Emitted when DAO minting occurs\"},\"e_syncChainStake(uint32,uint128,uint256)\":{\"notice\":\"Emitted when chain stake is synchronized\"},\"e_unstake(address,uint256,uint256,uint256,uint256)\":{\"notice\":\"Emitted when unstaking occurs\"},\"e_updatepool(uint256)\":{\"notice\":\"Emitted when the pool state is updated\"}},\"kind\":\"user\",\"methods\":{\"addShare((address,uint128,uint120,uint8))\":{\"notice\":\"Only callable on the main chain by the DAO adminReduces the left_share by the amount in _shareIncrements the shares_index and adds the new share to the shares mappingEmits an e_addShare event with the share details\"},\"addauths(address,uint256)\":{\"notice\":\"Only the DAO admin can call this function\"},\"addreferral(address,address)\":{\"notice\":\"Add a referral relationship\"},\"getreferralanddaoadmin(address)\":{\"notice\":\"Get the DAO admin and referral for a customer\"},\"rmauths(address)\":{\"notice\":\"Only the DAO admin can call this function\"},\"stake(address,uint128)\":{\"notice\":\"Stake tokens\"},\"unstake(address,uint128)\":{\"notice\":\"Unstake tokens\"}},\"notice\":\"Contains a series of interfaces for goods\",\"version\":1}},\"settings\":{\"compilationTarget\":{\"src/interfaces/I_TTSwap_Token.sol\":\"I_TTSwap_Token\"},\"evmVersion\":\"shanghai\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":true,\"runs\":100},\"remappings\":[\":@erc721permit/=lib/erc721-permit/contracts/\",\":@openzeppelin/contracts/=lib/openzeppelin-contracts/contracts/\",\":ds-test/=lib/forge-std/lib/ds-test/src/\",\":ds-test/=lib/openzeppelin-contracts/lib/forge-std/lib/ds-test/src/\",\":erc4626-tests/=lib/openzeppelin-contracts/lib/erc4626-tests/\",\":forge-gas-snapshot/=lib/forge-gas-snapshot/src/\",\":forge-std/=lib/forge-std/src/\",\":permit2/=lib/permit2/\",\":solmate/=lib/solmate/\"],\"viaIR\":true},\"sources\":{\"src/interfaces/I_TTSwap_Token.sol\":{\"keccak256\":\"0xfdeb5b46056868c866c24f36a58b3409389d2df4bb7569d55a7b017e919272c5\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://e308a2835dc7e30be096e9d7f833707bc791911b6bc1b21e23cc4b3edf61fdc6\",\"dweb:/ipfs/QmXXSKCjBKYDjr8oANHowYzzBMXw2ZoNbwfZsRkJduKWa4\"]}},\"version\":1}",
+					"storageLayout": {
+						"storage": [],
+						"types": null
+					},
+					"userdoc": {
+						"events": {
+							"e_addShare(address,uint256,uint120,uint8,uint32)": {
+								"notice": "Emitted when minting is added"
+							},
+							"e_addauths(address,uint256)": {
+								"notice": "Emitted when authorizations are added"
+							},
+							"e_addreferral(address,address)": {
+								"notice": "Emitted when a referral is added"
+							},
+							"e_burnShare(uint32)": {
+								"notice": "Emitted when minting is burned"
+							},
+							"e_publicsell(uint256,uint256)": {
+								"notice": "Emitted during a public sale"
+							},
+							"e_rmauths(address)": {
+								"notice": "Emitted when authorizations are removed"
+							},
+							"e_setdaoadmin(address)": {
+								"notice": "Emitted when a DAO admin is set"
+							},
+							"e_setenv(address,address,address)": {
+								"notice": "Emitted when environment variables are set"
+							},
+							"e_shareMint(uint128,uint32)": {
+								"notice": "Emitted when DAO minting occurs"
+							},
+							"e_syncChainStake(uint32,uint128,uint256)": {
+								"notice": "Emitted when chain stake is synchronized"
+							},
+							"e_unstake(address,uint256,uint256,uint256,uint256)": {
+								"notice": "Emitted when unstaking occurs"
+							},
+							"e_updatepool(uint256)": {
+								"notice": "Emitted when the pool state is updated"
+							}
+						},
+						"kind": "user",
+						"methods": {
+							"addShare((address,uint128,uint120,uint8))": {
+								"notice": "Only callable on the main chain by the DAO adminReduces the left_share by the amount in _shareIncrements the shares_index and adds the new share to the shares mappingEmits an e_addShare event with the share details"
+							},
+							"addauths(address,uint256)": {
+								"notice": "Only the DAO admin can call this function"
+							},
+							"addreferral(address,address)": {
+								"notice": "Add a referral relationship"
+							},
+							"getreferralanddaoadmin(address)": {
+								"notice": "Get the DAO admin and referral for a customer"
+							},
+							"rmauths(address)": {
+								"notice": "Only the DAO admin can call this function"
+							},
+							"stake(address,uint128)": {
+								"notice": "Stake tokens"
+							},
+							"unstake(address,uint128)": {
+								"notice": "Unstake tokens"
+							}
+						},
+						"notice": "Contains a series of interfaces for goods",
+						"version": 1
+					}
+				}
+			}
+		},
+		"sources": {
+			"src/interfaces/I_TTSwap_Token.sol": {
+				"ast": {
+					"absolutePath": "src/interfaces/I_TTSwap_Token.sol",
+					"exportedSymbols": {
+						"I_TTSwap_Token": [
+							297
+						],
+						"s_chain": [
+							313
+						],
+						"s_proof": [
+							318
+						],
+						"s_share": [
+							306
+						]
+					},
+					"id": 319,
+					"license": "MIT",
+					"nodeType": "SourceUnit",
+					"nodes": [
+						{
+							"id": 1,
+							"literals": [
+								"solidity",
+								"0.8",
+								".23"
+							],
+							"nodeType": "PragmaDirective",
+							"src": "32:23:0"
+						},
+						{
+							"abstract": false,
+							"baseContracts": [],
+							"canonicalName": "I_TTSwap_Token",
+							"contractDependencies": [],
+							"contractKind": "interface",
+							"documentation": {
+								"id": 2,
+								"nodeType": "StructuredDocumentation",
+								"src": "57:92:0",
+								"text": "@title Investment Proof Interface\n @notice Contains a series of interfaces for goods"
+							},
+							"fullyImplemented": false,
+							"id": 297,
+							"linearizedBaseContracts": [
+								297
+							],
+							"name": "I_TTSwap_Token",
+							"nameLocation": "159:14:0",
+							"nodeType": "ContractDefinition",
+							"nodes": [
+								{
+									"anonymous": false,
+									"documentation": {
+										"id": 3,
+										"nodeType": "StructuredDocumentation",
+										"src": "180:141:0",
+										"text": "@notice Emitted when a referral is added\n @param users The address of the user\n @param referral The address of the referrer"
+									},
+									"eventSelector": "0b5e322b4b5330962013e8d6519462c133d50320ee476828060995c1acadef62",
+									"id": 9,
+									"name": "e_addreferral",
+									"nameLocation": "332:13:0",
+									"nodeType": "EventDefinition",
+									"parameters": {
+										"id": 8,
+										"nodeType": "ParameterList",
+										"parameters": [
+											{
+												"constant": false,
+												"id": 5,
+												"indexed": false,
+												"mutability": "mutable",
+												"name": "users",
+												"nameLocation": "354:5:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 9,
+												"src": "346:13:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_address",
+													"typeString": "address"
+												},
+												"typeName": {
+													"id": 4,
+													"name": "address",
+													"nodeType": "ElementaryTypeName",
+													"src": "346:7:0",
+													"stateMutability": "nonpayable",
+													"typeDescriptions": {
+														"typeIdentifier": "t_address",
+														"typeString": "address"
+													}
+												},
+												"visibility": "internal"
+											},
+											{
+												"constant": false,
+												"id": 7,
+												"indexed": false,
+												"mutability": "mutable",
+												"name": "referral",
+												"nameLocation": "369:8:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 9,
+												"src": "361:16:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_address",
+													"typeString": "address"
+												},
+												"typeName": {
+													"id": 6,
+													"name": "address",
+													"nodeType": "ElementaryTypeName",
+													"src": "361:7:0",
+													"stateMutability": "nonpayable",
+													"typeDescriptions": {
+														"typeIdentifier": "t_address",
+														"typeString": "address"
+													}
+												},
+												"visibility": "internal"
+											}
+										],
+										"src": "345:33:0"
+									},
+									"src": "326:53:0"
+								},
+								{
+									"anonymous": false,
+									"documentation": {
+										"id": 10,
+										"nodeType": "StructuredDocumentation",
+										"src": "385:225:0",
+										"text": "@notice Emitted when environment variables are set\n @param normalgoodid The ID of the normal good\n @param valuegoodid The ID of the value good\n @param marketcontract The address of the market contract"
+									},
+									"eventSelector": "ad9bacb6411ac6d3f45f8cabf2c4629890ab593e58ad9c108ffef19037ce2796",
+									"id": 18,
+									"name": "e_setenv",
+									"nameLocation": "621:8:0",
+									"nodeType": "EventDefinition",
+									"parameters": {
+										"id": 17,
+										"nodeType": "ParameterList",
+										"parameters": [
+											{
+												"constant": false,
+												"id": 12,
+												"indexed": false,
+												"mutability": "mutable",
+												"name": "normalgoodid",
+												"nameLocation": "647:12:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 18,
+												"src": "639:20:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_address",
+													"typeString": "address"
+												},
+												"typeName": {
+													"id": 11,
+													"name": "address",
+													"nodeType": "ElementaryTypeName",
+													"src": "639:7:0",
+													"stateMutability": "nonpayable",
+													"typeDescriptions": {
+														"typeIdentifier": "t_address",
+														"typeString": "address"
+													}
+												},
+												"visibility": "internal"
+											},
+											{
+												"constant": false,
+												"id": 14,
+												"indexed": false,
+												"mutability": "mutable",
+												"name": "valuegoodid",
+												"nameLocation": "677:11:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 18,
+												"src": "669:19:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_address",
+													"typeString": "address"
+												},
+												"typeName": {
+													"id": 13,
+													"name": "address",
+													"nodeType": "ElementaryTypeName",
+													"src": "669:7:0",
+													"stateMutability": "nonpayable",
+													"typeDescriptions": {
+														"typeIdentifier": "t_address",
+														"typeString": "address"
+													}
+												},
+												"visibility": "internal"
+											},
+											{
+												"constant": false,
+												"id": 16,
+												"indexed": false,
+												"mutability": "mutable",
+												"name": "marketcontract",
+												"nameLocation": "706:14:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 18,
+												"src": "698:22:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_address",
+													"typeString": "address"
+												},
+												"typeName": {
+													"id": 15,
+													"name": "address",
+													"nodeType": "ElementaryTypeName",
+													"src": "698:7:0",
+													"stateMutability": "nonpayable",
+													"typeDescriptions": {
+														"typeIdentifier": "t_address",
+														"typeString": "address"
+													}
+												},
+												"visibility": "internal"
+											}
+										],
+										"src": "629:97:0"
+									},
+									"src": "615:112:0"
+								},
+								{
+									"anonymous": false,
+									"documentation": {
+										"id": 19,
+										"nodeType": "StructuredDocumentation",
+										"src": "733:101:0",
+										"text": "@notice Emitted when a DAO admin is set\n @param recipient The address of the new DAO admin"
+									},
+									"eventSelector": "853baecd5c22fcf8a4d994474a066771c51cfe6022b046e92a09874610cd1281",
+									"id": 23,
+									"name": "e_setdaoadmin",
+									"nameLocation": "845:13:0",
+									"nodeType": "EventDefinition",
+									"parameters": {
+										"id": 22,
+										"nodeType": "ParameterList",
+										"parameters": [
+											{
+												"constant": false,
+												"id": 21,
+												"indexed": false,
+												"mutability": "mutable",
+												"name": "recipient",
+												"nameLocation": "867:9:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 23,
+												"src": "859:17:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_address",
+													"typeString": "address"
+												},
+												"typeName": {
+													"id": 20,
+													"name": "address",
+													"nodeType": "ElementaryTypeName",
+													"src": "859:7:0",
+													"stateMutability": "nonpayable",
+													"typeDescriptions": {
+														"typeIdentifier": "t_address",
+														"typeString": "address"
+													}
+												},
+												"visibility": "internal"
+											}
+										],
+										"src": "858:19:0"
+									},
+									"src": "839:39:0"
+								},
+								{
+									"anonymous": false,
+									"documentation": {
+										"id": 24,
+										"nodeType": "StructuredDocumentation",
+										"src": "884:153:0",
+										"text": "@notice Emitted when authorizations are added\n @param auths The address being authorized\n @param priv The privilege level being granted"
+									},
+									"eventSelector": "967d50df84a5ebb45902fa277d5c3b0bc6403497c9fd6da2ecbd9ed420038f14",
+									"id": 30,
+									"name": "e_addauths",
+									"nameLocation": "1048:10:0",
+									"nodeType": "EventDefinition",
+									"parameters": {
+										"id": 29,
+										"nodeType": "ParameterList",
+										"parameters": [
+											{
+												"constant": false,
+												"id": 26,
+												"indexed": false,
+												"mutability": "mutable",
+												"name": "auths",
+												"nameLocation": "1067:5:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 30,
+												"src": "1059:13:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_address",
+													"typeString": "address"
+												},
+												"typeName": {
+													"id": 25,
+													"name": "address",
+													"nodeType": "ElementaryTypeName",
+													"src": "1059:7:0",
+													"stateMutability": "nonpayable",
+													"typeDescriptions": {
+														"typeIdentifier": "t_address",
+														"typeString": "address"
+													}
+												},
+												"visibility": "internal"
+											},
+											{
+												"constant": false,
+												"id": 28,
+												"indexed": false,
+												"mutability": "mutable",
+												"name": "priv",
+												"nameLocation": "1082:4:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 30,
+												"src": "1074:12:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_uint256",
+													"typeString": "uint256"
+												},
+												"typeName": {
+													"id": 27,
+													"name": "uint256",
+													"nodeType": "ElementaryTypeName",
+													"src": "1074:7:0",
+													"typeDescriptions": {
+														"typeIdentifier": "t_uint256",
+														"typeString": "uint256"
+													}
+												},
+												"visibility": "internal"
+											}
+										],
+										"src": "1058:29:0"
+									},
+									"src": "1042:46:0"
+								},
+								{
+									"anonymous": false,
+									"documentation": {
+										"id": 31,
+										"nodeType": "StructuredDocumentation",
+										"src": "1094:103:0",
+										"text": "@notice Emitted when authorizations are removed\n @param auths The address being deauthorized"
+									},
+									"eventSelector": "3680a8b72561b4141a1464124f40242ac80a59d51d29649d9b0b442c255b6289",
+									"id": 35,
+									"name": "e_rmauths",
+									"nameLocation": "1208:9:0",
+									"nodeType": "EventDefinition",
+									"parameters": {
+										"id": 34,
+										"nodeType": "ParameterList",
+										"parameters": [
+											{
+												"constant": false,
+												"id": 33,
+												"indexed": false,
+												"mutability": "mutable",
+												"name": "auths",
+												"nameLocation": "1226:5:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 35,
+												"src": "1218:13:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_address",
+													"typeString": "address"
+												},
+												"typeName": {
+													"id": 32,
+													"name": "address",
+													"nodeType": "ElementaryTypeName",
+													"src": "1218:7:0",
+													"stateMutability": "nonpayable",
+													"typeDescriptions": {
+														"typeIdentifier": "t_address",
+														"typeString": "address"
+													}
+												},
+												"visibility": "internal"
+											}
+										],
+										"src": "1217:15:0"
+									},
+									"src": "1202:31:0"
+								},
+								{
+									"anonymous": false,
+									"documentation": {
+										"id": 36,
+										"nodeType": "StructuredDocumentation",
+										"src": "1239:313:0",
+										"text": "@notice Emitted when minting is added\n @param recipient The address receiving the minted tokens\n @param leftamount The remaining amount to be minted\n @param metric The metric used for minting\n @param chips The number of chips\n @param index The index of the minting operation"
+									},
+									"eventSelector": "259b626a3ac57abbad46c244a9bc2a13c0b530c618e9654be9351bd104cffcae",
+									"id": 48,
+									"name": "e_addShare",
+									"nameLocation": "1563:10:0",
+									"nodeType": "EventDefinition",
+									"parameters": {
+										"id": 47,
+										"nodeType": "ParameterList",
+										"parameters": [
+											{
+												"constant": false,
+												"id": 38,
+												"indexed": false,
+												"mutability": "mutable",
+												"name": "recipient",
+												"nameLocation": "1591:9:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 48,
+												"src": "1583:17:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_address",
+													"typeString": "address"
+												},
+												"typeName": {
+													"id": 37,
+													"name": "address",
+													"nodeType": "ElementaryTypeName",
+													"src": "1583:7:0",
+													"stateMutability": "nonpayable",
+													"typeDescriptions": {
+														"typeIdentifier": "t_address",
+														"typeString": "address"
+													}
+												},
+												"visibility": "internal"
+											},
+											{
+												"constant": false,
+												"id": 40,
+												"indexed": false,
+												"mutability": "mutable",
+												"name": "leftamount",
+												"nameLocation": "1618:10:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 48,
+												"src": "1610:18:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_uint256",
+													"typeString": "uint256"
+												},
+												"typeName": {
+													"id": 39,
+													"name": "uint256",
+													"nodeType": "ElementaryTypeName",
+													"src": "1610:7:0",
+													"typeDescriptions": {
+														"typeIdentifier": "t_uint256",
+														"typeString": "uint256"
+													}
+												},
+												"visibility": "internal"
+											},
+											{
+												"constant": false,
+												"id": 42,
+												"indexed": false,
+												"mutability": "mutable",
+												"name": "metric",
+												"nameLocation": "1646:6:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 48,
+												"src": "1638:14:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_uint120",
+													"typeString": "uint120"
+												},
+												"typeName": {
+													"id": 41,
+													"name": "uint120",
+													"nodeType": "ElementaryTypeName",
+													"src": "1638:7:0",
+													"typeDescriptions": {
+														"typeIdentifier": "t_uint120",
+														"typeString": "uint120"
+													}
+												},
+												"visibility": "internal"
+											},
+											{
+												"constant": false,
+												"id": 44,
+												"indexed": false,
+												"mutability": "mutable",
+												"name": "chips",
+												"nameLocation": "1668:5:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 48,
+												"src": "1662:11:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_uint8",
+													"typeString": "uint8"
+												},
+												"typeName": {
+													"id": 43,
+													"name": "uint8",
+													"nodeType": "ElementaryTypeName",
+													"src": "1662:5:0",
+													"typeDescriptions": {
+														"typeIdentifier": "t_uint8",
+														"typeString": "uint8"
+													}
+												},
+												"visibility": "internal"
+											},
+											{
+												"constant": false,
+												"id": 46,
+												"indexed": false,
+												"mutability": "mutable",
+												"name": "index",
+												"nameLocation": "1690:5:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 48,
+												"src": "1683:12:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_uint32",
+													"typeString": "uint32"
+												},
+												"typeName": {
+													"id": 45,
+													"name": "uint32",
+													"nodeType": "ElementaryTypeName",
+													"src": "1683:6:0",
+													"typeDescriptions": {
+														"typeIdentifier": "t_uint32",
+														"typeString": "uint32"
+													}
+												},
+												"visibility": "internal"
+											}
+										],
+										"src": "1573:128:0"
+									},
+									"src": "1557:145:0"
+								},
+								{
+									"anonymous": false,
+									"documentation": {
+										"id": 49,
+										"nodeType": "StructuredDocumentation",
+										"src": "1708:111:0",
+										"text": "@notice Emitted when minting is burned\n @param index The index of the minting operation being burned"
+									},
+									"eventSelector": "568d364b674966bdb889933148a94e885581320f54b5d65d04bda235eea7fe48",
+									"id": 53,
+									"name": "e_burnShare",
+									"nameLocation": "1830:11:0",
+									"nodeType": "EventDefinition",
+									"parameters": {
+										"id": 52,
+										"nodeType": "ParameterList",
+										"parameters": [
+											{
+												"constant": false,
+												"id": 51,
+												"indexed": false,
+												"mutability": "mutable",
+												"name": "index",
+												"nameLocation": "1849:5:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 53,
+												"src": "1842:12:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_uint32",
+													"typeString": "uint32"
+												},
+												"typeName": {
+													"id": 50,
+													"name": "uint32",
+													"nodeType": "ElementaryTypeName",
+													"src": "1842:6:0",
+													"typeDescriptions": {
+														"typeIdentifier": "t_uint32",
+														"typeString": "uint32"
+													}
+												},
+												"visibility": "internal"
+											}
+										],
+										"src": "1841:14:0"
+									},
+									"src": "1824:32:0"
+								},
+								{
+									"anonymous": false,
+									"documentation": {
+										"id": 54,
+										"nodeType": "StructuredDocumentation",
+										"src": "1862:149:0",
+										"text": "@notice Emitted when DAO minting occurs\n @param mintamount The amount being minted\n @param index The index of the minting operation"
+									},
+									"eventSelector": "83592ad363894b5c4d81b2113457c5a1683230ce1c133eefa927d17f65cd5ca0",
+									"id": 60,
+									"name": "e_shareMint",
+									"nameLocation": "2022:11:0",
+									"nodeType": "EventDefinition",
+									"parameters": {
+										"id": 59,
+										"nodeType": "ParameterList",
+										"parameters": [
+											{
+												"constant": false,
+												"id": 56,
+												"indexed": false,
+												"mutability": "mutable",
+												"name": "mintamount",
+												"nameLocation": "2042:10:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 60,
+												"src": "2034:18:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_uint128",
+													"typeString": "uint128"
+												},
+												"typeName": {
+													"id": 55,
+													"name": "uint128",
+													"nodeType": "ElementaryTypeName",
+													"src": "2034:7:0",
+													"typeDescriptions": {
+														"typeIdentifier": "t_uint128",
+														"typeString": "uint128"
+													}
+												},
+												"visibility": "internal"
+											},
+											{
+												"constant": false,
+												"id": 58,
+												"indexed": false,
+												"mutability": "mutable",
+												"name": "index",
+												"nameLocation": "2061:5:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 60,
+												"src": "2054:12:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_uint32",
+													"typeString": "uint32"
+												},
+												"typeName": {
+													"id": 57,
+													"name": "uint32",
+													"nodeType": "ElementaryTypeName",
+													"src": "2054:6:0",
+													"typeDescriptions": {
+														"typeIdentifier": "t_uint32",
+														"typeString": "uint32"
+													}
+												},
+												"visibility": "internal"
+											}
+										],
+										"src": "2033:34:0"
+									},
+									"src": "2016:52:0"
+								},
+								{
+									"anonymous": false,
+									"documentation": {
+										"id": 61,
+										"nodeType": "StructuredDocumentation",
+										"src": "2074:146:0",
+										"text": "@notice Emitted during a public sale\n @param usdtamount The amount of USDT involved\n @param ttsamount The amount of TTS involved"
+									},
+									"eventSelector": "cf0848d99e9b2ad96811072e657199bc9567c2cc9b614097727a852b27f5358d",
+									"id": 67,
+									"name": "e_publicsell",
+									"nameLocation": "2231:12:0",
+									"nodeType": "EventDefinition",
+									"parameters": {
+										"id": 66,
+										"nodeType": "ParameterList",
+										"parameters": [
+											{
+												"constant": false,
+												"id": 63,
+												"indexed": false,
+												"mutability": "mutable",
+												"name": "usdtamount",
+												"nameLocation": "2252:10:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 67,
+												"src": "2244:18:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_uint256",
+													"typeString": "uint256"
+												},
+												"typeName": {
+													"id": 62,
+													"name": "uint256",
+													"nodeType": "ElementaryTypeName",
+													"src": "2244:7:0",
+													"typeDescriptions": {
+														"typeIdentifier": "t_uint256",
+														"typeString": "uint256"
+													}
+												},
+												"visibility": "internal"
+											},
+											{
+												"constant": false,
+												"id": 65,
+												"indexed": false,
+												"mutability": "mutable",
+												"name": "ttsamount",
+												"nameLocation": "2272:9:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 67,
+												"src": "2264:17:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_uint256",
+													"typeString": "uint256"
+												},
+												"typeName": {
+													"id": 64,
+													"name": "uint256",
+													"nodeType": "ElementaryTypeName",
+													"src": "2264:7:0",
+													"typeDescriptions": {
+														"typeIdentifier": "t_uint256",
+														"typeString": "uint256"
+													}
+												},
+												"visibility": "internal"
+											}
+										],
+										"src": "2243:39:0"
+									},
+									"src": "2225:58:0"
+								},
+								{
+									"anonymous": false,
+									"documentation": {
+										"id": 68,
+										"nodeType": "StructuredDocumentation",
+										"src": "2289:181:0",
+										"text": "@notice Emitted when chain stake is synchronized\n @param chain The chain ID\n @param poolasset The pool asset value\n @param proofstate  The value of the pool"
+									},
+									"eventSelector": "2dbd6c60950a71a3b42582ce495af627a70477170cea6ce5bbd4017f3e930892",
+									"id": 76,
+									"name": "e_syncChainStake",
+									"nameLocation": "2481:16:0",
+									"nodeType": "EventDefinition",
+									"parameters": {
+										"id": 75,
+										"nodeType": "ParameterList",
+										"parameters": [
+											{
+												"constant": false,
+												"id": 70,
+												"indexed": false,
+												"mutability": "mutable",
+												"name": "chain",
+												"nameLocation": "2514:5:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 76,
+												"src": "2507:12:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_uint32",
+													"typeString": "uint32"
+												},
+												"typeName": {
+													"id": 69,
+													"name": "uint32",
+													"nodeType": "ElementaryTypeName",
+													"src": "2507:6:0",
+													"typeDescriptions": {
+														"typeIdentifier": "t_uint32",
+														"typeString": "uint32"
+													}
+												},
+												"visibility": "internal"
+											},
+											{
+												"constant": false,
+												"id": 72,
+												"indexed": false,
+												"mutability": "mutable",
+												"name": "poolasset",
+												"nameLocation": "2537:9:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 76,
+												"src": "2529:17:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_uint128",
+													"typeString": "uint128"
+												},
+												"typeName": {
+													"id": 71,
+													"name": "uint128",
+													"nodeType": "ElementaryTypeName",
+													"src": "2529:7:0",
+													"typeDescriptions": {
+														"typeIdentifier": "t_uint128",
+														"typeString": "uint128"
+													}
+												},
+												"visibility": "internal"
+											},
+											{
+												"constant": false,
+												"id": 74,
+												"indexed": false,
+												"mutability": "mutable",
+												"name": "proofstate",
+												"nameLocation": "2564:10:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 76,
+												"src": "2556:18:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_uint256",
+													"typeString": "uint256"
+												},
+												"typeName": {
+													"id": 73,
+													"name": "uint256",
+													"nodeType": "ElementaryTypeName",
+													"src": "2556:7:0",
+													"typeDescriptions": {
+														"typeIdentifier": "t_uint256",
+														"typeString": "uint256"
+													}
+												},
+												"visibility": "internal"
+											}
+										],
+										"src": "2497:138:0"
+									},
+									"src": "2475:161:0"
+								},
+								{
+									"anonymous": false,
+									"documentation": {
+										"id": 77,
+										"nodeType": "StructuredDocumentation",
+										"src": "2642:335:0",
+										"text": "@notice Emitted when unstaking occurs\n @param recipient The address receiving the unstaked tokens\n @param proofvalue first 128 bit proofvalue,last 128 bit poolcontruct\n @param unstakestate The state after unstaking\n @param stakestate The state of the stake\n @param poolstate The state of the pool"
+									},
+									"eventSelector": "62025eae57aa13c48667a44135999b1c087e0e00de741759cefa772a4eb02567",
+									"id": 89,
+									"name": "e_unstake",
+									"nameLocation": "2988:9:0",
+									"nodeType": "EventDefinition",
+									"parameters": {
+										"id": 88,
+										"nodeType": "ParameterList",
+										"parameters": [
+											{
+												"constant": false,
+												"id": 79,
+												"indexed": false,
+												"mutability": "mutable",
+												"name": "recipient",
+												"nameLocation": "3015:9:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 89,
+												"src": "3007:17:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_address",
+													"typeString": "address"
+												},
+												"typeName": {
+													"id": 78,
+													"name": "address",
+													"nodeType": "ElementaryTypeName",
+													"src": "3007:7:0",
+													"stateMutability": "nonpayable",
+													"typeDescriptions": {
+														"typeIdentifier": "t_address",
+														"typeString": "address"
+													}
+												},
+												"visibility": "internal"
+											},
+											{
+												"constant": false,
+												"id": 81,
+												"indexed": false,
+												"mutability": "mutable",
+												"name": "proofvalue",
+												"nameLocation": "3042:10:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 89,
+												"src": "3034:18:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_uint256",
+													"typeString": "uint256"
+												},
+												"typeName": {
+													"id": 80,
+													"name": "uint256",
+													"nodeType": "ElementaryTypeName",
+													"src": "3034:7:0",
+													"typeDescriptions": {
+														"typeIdentifier": "t_uint256",
+														"typeString": "uint256"
+													}
+												},
+												"visibility": "internal"
+											},
+											{
+												"constant": false,
+												"id": 83,
+												"indexed": false,
+												"mutability": "mutable",
+												"name": "unstakestate",
+												"nameLocation": "3070:12:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 89,
+												"src": "3062:20:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_uint256",
+													"typeString": "uint256"
+												},
+												"typeName": {
+													"id": 82,
+													"name": "uint256",
+													"nodeType": "ElementaryTypeName",
+													"src": "3062:7:0",
+													"typeDescriptions": {
+														"typeIdentifier": "t_uint256",
+														"typeString": "uint256"
+													}
+												},
+												"visibility": "internal"
+											},
+											{
+												"constant": false,
+												"id": 85,
+												"indexed": false,
+												"mutability": "mutable",
+												"name": "stakestate",
+												"nameLocation": "3100:10:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 89,
+												"src": "3092:18:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_uint256",
+													"typeString": "uint256"
+												},
+												"typeName": {
+													"id": 84,
+													"name": "uint256",
+													"nodeType": "ElementaryTypeName",
+													"src": "3092:7:0",
+													"typeDescriptions": {
+														"typeIdentifier": "t_uint256",
+														"typeString": "uint256"
+													}
+												},
+												"visibility": "internal"
+											},
+											{
+												"constant": false,
+												"id": 87,
+												"indexed": false,
+												"mutability": "mutable",
+												"name": "poolstate",
+												"nameLocation": "3128:9:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 89,
+												"src": "3120:17:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_uint256",
+													"typeString": "uint256"
+												},
+												"typeName": {
+													"id": 86,
+													"name": "uint256",
+													"nodeType": "ElementaryTypeName",
+													"src": "3120:7:0",
+													"typeDescriptions": {
+														"typeIdentifier": "t_uint256",
+														"typeString": "uint256"
+													}
+												},
+												"visibility": "internal"
+											}
+										],
+										"src": "2997:146:0"
+									},
+									"src": "2982:162:0"
+								},
+								{
+									"anonymous": false,
+									"documentation": {
+										"id": 90,
+										"nodeType": "StructuredDocumentation",
+										"src": "3149:101:0",
+										"text": "@notice Emitted when the pool state is updated\n @param poolstate The new state of the pool"
+									},
+									"eventSelector": "640eaa6ba71a4f457fdf8b26b0a8a0a6096d6d2bf731d07d47717534847ce55d",
+									"id": 94,
+									"name": "e_updatepool",
+									"nameLocation": "3261:12:0",
+									"nodeType": "EventDefinition",
+									"parameters": {
+										"id": 93,
+										"nodeType": "ParameterList",
+										"parameters": [
+											{
+												"constant": false,
+												"id": 92,
+												"indexed": false,
+												"mutability": "mutable",
+												"name": "poolstate",
+												"nameLocation": "3282:9:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 94,
+												"src": "3274:17:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_uint256",
+													"typeString": "uint256"
+												},
+												"typeName": {
+													"id": 91,
+													"name": "uint256",
+													"nodeType": "ElementaryTypeName",
+													"src": "3274:7:0",
+													"typeDescriptions": {
+														"typeIdentifier": "t_uint256",
+														"typeString": "uint256"
+													}
+												},
+												"visibility": "internal"
+											}
+										],
+										"src": "3273:19:0"
+									},
+									"src": "3255:38:0"
+								},
+								{
+									"documentation": {
+										"id": 95,
+										"nodeType": "StructuredDocumentation",
+										"src": "3298:124:0",
+										"text": " @dev  Returns the address of the DAO admin\n @return _dao_admin Returns the address of the DAO admin"
+									},
+									"functionSelector": "a538e6a9",
+									"id": 100,
+									"implemented": false,
+									"kind": "function",
+									"modifiers": [],
+									"name": "dao_admin",
+									"nameLocation": "3436:9:0",
+									"nodeType": "FunctionDefinition",
+									"parameters": {
+										"id": 96,
+										"nodeType": "ParameterList",
+										"parameters": [],
+										"src": "3445:2:0"
+									},
+									"returnParameters": {
+										"id": 99,
+										"nodeType": "ParameterList",
+										"parameters": [
+											{
+												"constant": false,
+												"id": 98,
+												"mutability": "mutable",
+												"name": "_dao_admin",
+												"nameLocation": "3479:10:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 100,
+												"src": "3471:18:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_address",
+													"typeString": "address"
+												},
+												"typeName": {
+													"id": 97,
+													"name": "address",
+													"nodeType": "ElementaryTypeName",
+													"src": "3471:7:0",
+													"stateMutability": "nonpayable",
+													"typeDescriptions": {
+														"typeIdentifier": "t_address",
+														"typeString": "address"
+													}
+												},
+												"visibility": "internal"
+											}
+										],
+										"src": "3470:20:0"
+									},
+									"scope": 297,
+									"src": "3427:64:0",
+									"stateMutability": "view",
+									"virtual": false,
+									"visibility": "external"
+								},
+								{
+									"documentation": {
+										"id": 101,
+										"nodeType": "StructuredDocumentation",
+										"src": "3496:136:0",
+										"text": " @dev  Returns the address of the market contract\n @return _marketcontract Returns the address of marketcontract"
+									},
+									"functionSelector": "2bf960da",
+									"id": 106,
+									"implemented": false,
+									"kind": "function",
+									"modifiers": [],
+									"name": "marketcontract",
+									"nameLocation": "3646:14:0",
+									"nodeType": "FunctionDefinition",
+									"parameters": {
+										"id": 102,
+										"nodeType": "ParameterList",
+										"parameters": [],
+										"src": "3660:2:0"
+									},
+									"returnParameters": {
+										"id": 105,
+										"nodeType": "ParameterList",
+										"parameters": [
+											{
+												"constant": false,
+												"id": 104,
+												"mutability": "mutable",
+												"name": "_marketcontract",
+												"nameLocation": "3694:15:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 106,
+												"src": "3686:23:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_address",
+													"typeString": "address"
+												},
+												"typeName": {
+													"id": 103,
+													"name": "address",
+													"nodeType": "ElementaryTypeName",
+													"src": "3686:7:0",
+													"stateMutability": "nonpayable",
+													"typeDescriptions": {
+														"typeIdentifier": "t_address",
+														"typeString": "address"
+													}
+												},
+												"visibility": "internal"
+											}
+										],
+										"src": "3685:25:0"
+									},
+									"scope": 297,
+									"src": "3637:74:0",
+									"stateMutability": "view",
+									"virtual": false,
+									"visibility": "external"
+								},
+								{
+									"documentation": {
+										"id": 107,
+										"nodeType": "StructuredDocumentation",
+										"src": "3716:117:0",
+										"text": " @dev   Returns the ID of the normal good\n @return _normalgoodid Returns the id of normalgood"
+									},
+									"functionSelector": "02517e8b",
+									"id": 112,
+									"implemented": false,
+									"kind": "function",
+									"modifiers": [],
+									"name": "normalgoodid",
+									"nameLocation": "3847:12:0",
+									"nodeType": "FunctionDefinition",
+									"parameters": {
+										"id": 108,
+										"nodeType": "ParameterList",
+										"parameters": [],
+										"src": "3859:2:0"
+									},
+									"returnParameters": {
+										"id": 111,
+										"nodeType": "ParameterList",
+										"parameters": [
+											{
+												"constant": false,
+												"id": 110,
+												"mutability": "mutable",
+												"name": "_normalgoodid",
+												"nameLocation": "3893:13:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 112,
+												"src": "3885:21:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_address",
+													"typeString": "address"
+												},
+												"typeName": {
+													"id": 109,
+													"name": "address",
+													"nodeType": "ElementaryTypeName",
+													"src": "3885:7:0",
+													"stateMutability": "nonpayable",
+													"typeDescriptions": {
+														"typeIdentifier": "t_address",
+														"typeString": "address"
+													}
+												},
+												"visibility": "internal"
+											}
+										],
+										"src": "3884:23:0"
+									},
+									"scope": 297,
+									"src": "3838:70:0",
+									"stateMutability": "view",
+									"virtual": false,
+									"visibility": "external"
+								},
+								{
+									"documentation": {
+										"id": 113,
+										"nodeType": "StructuredDocumentation",
+										"src": "3913:120:0",
+										"text": " @dev   Returns the ID of the value good\n @return _valuegoodid Returns the id of the valuegoodid"
+									},
+									"functionSelector": "f35da462",
+									"id": 118,
+									"implemented": false,
+									"kind": "function",
+									"modifiers": [],
+									"name": "valuegoodid",
+									"nameLocation": "4047:11:0",
+									"nodeType": "FunctionDefinition",
+									"parameters": {
+										"id": 114,
+										"nodeType": "ParameterList",
+										"parameters": [],
+										"src": "4058:2:0"
+									},
+									"returnParameters": {
+										"id": 117,
+										"nodeType": "ParameterList",
+										"parameters": [
+											{
+												"constant": false,
+												"id": 116,
+												"mutability": "mutable",
+												"name": "_valuegoodid",
+												"nameLocation": "4092:12:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 118,
+												"src": "4084:20:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_address",
+													"typeString": "address"
+												},
+												"typeName": {
+													"id": 115,
+													"name": "address",
+													"nodeType": "ElementaryTypeName",
+													"src": "4084:7:0",
+													"stateMutability": "nonpayable",
+													"typeDescriptions": {
+														"typeIdentifier": "t_address",
+														"typeString": "address"
+													}
+												},
+												"visibility": "internal"
+											}
+										],
+										"src": "4083:22:0"
+									},
+									"scope": 297,
+									"src": "4038:68:0",
+									"stateMutability": "view",
+									"virtual": false,
+									"visibility": "external"
+								},
+								{
+									"documentation": {
+										"id": 119,
+										"nodeType": "StructuredDocumentation",
+										"src": "4111:155:0",
+										"text": " @dev  Returns the amount of TTS available for public sale\n @return _publicsell Returns the amount of TTS available for public sale"
+									},
+									"functionSelector": "de5712d4",
+									"id": 124,
+									"implemented": false,
+									"kind": "function",
+									"modifiers": [],
+									"name": "publicsell",
+									"nameLocation": "4280:10:0",
+									"nodeType": "FunctionDefinition",
+									"parameters": {
+										"id": 120,
+										"nodeType": "ParameterList",
+										"parameters": [],
+										"src": "4290:2:0"
+									},
+									"returnParameters": {
+										"id": 123,
+										"nodeType": "ParameterList",
+										"parameters": [
+											{
+												"constant": false,
+												"id": 122,
+												"mutability": "mutable",
+												"name": "_publicsell",
+												"nameLocation": "4324:11:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 124,
+												"src": "4316:19:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_uint128",
+													"typeString": "uint128"
+												},
+												"typeName": {
+													"id": 121,
+													"name": "uint128",
+													"nodeType": "ElementaryTypeName",
+													"src": "4316:7:0",
+													"typeDescriptions": {
+														"typeIdentifier": "t_uint128",
+														"typeString": "uint128"
+													}
+												},
+												"visibility": "internal"
+											}
+										],
+										"src": "4315:21:0"
+									},
+									"scope": 297,
+									"src": "4271:66:0",
+									"stateMutability": "view",
+									"virtual": false,
+									"visibility": "external"
+								},
+								{
+									"documentation": {
+										"id": 125,
+										"nodeType": "StructuredDocumentation",
+										"src": "4342:180:0",
+										"text": " @dev  Returns the referrer address for a given user\n @param _recipent user's address\n @return _referral Returns the referrer address for a given user"
+									},
+									"functionSelector": "9ca423b3",
+									"id": 132,
+									"implemented": false,
+									"kind": "function",
+									"modifiers": [],
+									"name": "referrals",
+									"nameLocation": "4536:9:0",
+									"nodeType": "FunctionDefinition",
+									"parameters": {
+										"id": 128,
+										"nodeType": "ParameterList",
+										"parameters": [
+											{
+												"constant": false,
+												"id": 127,
+												"mutability": "mutable",
+												"name": "_recipent",
+												"nameLocation": "4563:9:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 132,
+												"src": "4555:17:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_address",
+													"typeString": "address"
+												},
+												"typeName": {
+													"id": 126,
+													"name": "address",
+													"nodeType": "ElementaryTypeName",
+													"src": "4555:7:0",
+													"stateMutability": "nonpayable",
+													"typeDescriptions": {
+														"typeIdentifier": "t_address",
+														"typeString": "address"
+													}
+												},
+												"visibility": "internal"
+											}
+										],
+										"src": "4545:33:0"
+									},
+									"returnParameters": {
+										"id": 131,
+										"nodeType": "ParameterList",
+										"parameters": [
+											{
+												"constant": false,
+												"id": 130,
+												"mutability": "mutable",
+												"name": "_referral",
+												"nameLocation": "4610:9:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 132,
+												"src": "4602:17:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_address",
+													"typeString": "address"
+												},
+												"typeName": {
+													"id": 129,
+													"name": "address",
+													"nodeType": "ElementaryTypeName",
+													"src": "4602:7:0",
+													"stateMutability": "nonpayable",
+													"typeDescriptions": {
+														"typeIdentifier": "t_address",
+														"typeString": "address"
+													}
+												},
+												"visibility": "internal"
+											}
+										],
+										"src": "4601:19:0"
+									},
+									"scope": 297,
+									"src": "4527:94:0",
+									"stateMutability": "view",
+									"virtual": false,
+									"visibility": "external"
+								},
+								{
+									"documentation": {
+										"id": 133,
+										"nodeType": "StructuredDocumentation",
+										"src": "4626:166:0",
+										"text": " @dev Returns the authorization level for a given address\n @param recipent user's address\n @return _auth Returns the authorization level"
+									},
+									"functionSelector": "64e72dbd",
+									"id": 140,
+									"implemented": false,
+									"kind": "function",
+									"modifiers": [],
+									"name": "auths",
+									"nameLocation": "4806:5:0",
+									"nodeType": "FunctionDefinition",
+									"parameters": {
+										"id": 136,
+										"nodeType": "ParameterList",
+										"parameters": [
+											{
+												"constant": false,
+												"id": 135,
+												"mutability": "mutable",
+												"name": "recipent",
+												"nameLocation": "4820:8:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 140,
+												"src": "4812:16:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_address",
+													"typeString": "address"
+												},
+												"typeName": {
+													"id": 134,
+													"name": "address",
+													"nodeType": "ElementaryTypeName",
+													"src": "4812:7:0",
+													"stateMutability": "nonpayable",
+													"typeDescriptions": {
+														"typeIdentifier": "t_address",
+														"typeString": "address"
+													}
+												},
+												"visibility": "internal"
+											}
+										],
+										"src": "4811:18:0"
+									},
+									"returnParameters": {
+										"id": 139,
+										"nodeType": "ParameterList",
+										"parameters": [
+											{
+												"constant": false,
+												"id": 138,
+												"mutability": "mutable",
+												"name": "_auth",
+												"nameLocation": "4861:5:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 140,
+												"src": "4853:13:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_uint256",
+													"typeString": "uint256"
+												},
+												"typeName": {
+													"id": 137,
+													"name": "uint256",
+													"nodeType": "ElementaryTypeName",
+													"src": "4853:7:0",
+													"typeDescriptions": {
+														"typeIdentifier": "t_uint256",
+														"typeString": "uint256"
+													}
+												},
+												"visibility": "internal"
+											}
+										],
+										"src": "4852:15:0"
+									},
+									"scope": 297,
+									"src": "4797:71:0",
+									"stateMutability": "view",
+									"virtual": false,
+									"visibility": "external"
+								},
+								{
+									"functionSelector": "fa82add5",
+									"id": 149,
+									"implemented": false,
+									"kind": "function",
+									"modifiers": [],
+									"name": "setEnv",
+									"nameLocation": "4882:6:0",
+									"nodeType": "FunctionDefinition",
+									"parameters": {
+										"id": 147,
+										"nodeType": "ParameterList",
+										"parameters": [
+											{
+												"constant": false,
+												"id": 142,
+												"mutability": "mutable",
+												"name": "_normalgoodid",
+												"nameLocation": "4906:13:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 149,
+												"src": "4898:21:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_address",
+													"typeString": "address"
+												},
+												"typeName": {
+													"id": 141,
+													"name": "address",
+													"nodeType": "ElementaryTypeName",
+													"src": "4898:7:0",
+													"stateMutability": "nonpayable",
+													"typeDescriptions": {
+														"typeIdentifier": "t_address",
+														"typeString": "address"
+													}
+												},
+												"visibility": "internal"
+											},
+											{
+												"constant": false,
+												"id": 144,
+												"mutability": "mutable",
+												"name": "_valuegoodid",
+												"nameLocation": "4937:12:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 149,
+												"src": "4929:20:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_address",
+													"typeString": "address"
+												},
+												"typeName": {
+													"id": 143,
+													"name": "address",
+													"nodeType": "ElementaryTypeName",
+													"src": "4929:7:0",
+													"stateMutability": "nonpayable",
+													"typeDescriptions": {
+														"typeIdentifier": "t_address",
+														"typeString": "address"
+													}
+												},
+												"visibility": "internal"
+											},
+											{
+												"constant": false,
+												"id": 146,
+												"mutability": "mutable",
+												"name": "_marketcontract",
+												"nameLocation": "4967:15:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 149,
+												"src": "4959:23:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_address",
+													"typeString": "address"
+												},
+												"typeName": {
+													"id": 145,
+													"name": "address",
+													"nodeType": "ElementaryTypeName",
+													"src": "4959:7:0",
+													"stateMutability": "nonpayable",
+													"typeDescriptions": {
+														"typeIdentifier": "t_address",
+														"typeString": "address"
+													}
+												},
+												"visibility": "internal"
+											}
+										],
+										"src": "4888:100:0"
+									},
+									"returnParameters": {
+										"id": 148,
+										"nodeType": "ParameterList",
+										"parameters": [],
+										"src": "4997:0:0"
+									},
+									"scope": 297,
+									"src": "4873:125:0",
+									"stateMutability": "nonpayable",
+									"virtual": false,
+									"visibility": "external"
+								},
+								{
+									"documentation": {
+										"id": 150,
+										"nodeType": "StructuredDocumentation",
+										"src": "5100:120:0",
+										"text": " @dev Changes the DAO admin to the specified recipient address\n @param _recipient user's address"
+									},
+									"functionSelector": "3cba316b",
+									"id": 155,
+									"implemented": false,
+									"kind": "function",
+									"modifiers": [],
+									"name": "changeDAOAdmin",
+									"nameLocation": "5234:14:0",
+									"nodeType": "FunctionDefinition",
+									"parameters": {
+										"id": 153,
+										"nodeType": "ParameterList",
+										"parameters": [
+											{
+												"constant": false,
+												"id": 152,
+												"mutability": "mutable",
+												"name": "_recipient",
+												"nameLocation": "5257:10:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 155,
+												"src": "5249:18:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_address",
+													"typeString": "address"
+												},
+												"typeName": {
+													"id": 151,
+													"name": "address",
+													"nodeType": "ElementaryTypeName",
+													"src": "5249:7:0",
+													"stateMutability": "nonpayable",
+													"typeDescriptions": {
+														"typeIdentifier": "t_address",
+														"typeString": "address"
+													}
+												},
+												"visibility": "internal"
+											}
+										],
+										"src": "5248:20:0"
+									},
+									"returnParameters": {
+										"id": 154,
+										"nodeType": "ParameterList",
+										"parameters": [],
+										"src": "5277:0:0"
+									},
+									"scope": 297,
+									"src": "5225:53:0",
+									"stateMutability": "nonpayable",
+									"virtual": false,
+									"visibility": "external"
+								},
+								{
+									"documentation": {
+										"id": 156,
+										"nodeType": "StructuredDocumentation",
+										"src": "5283:428:0",
+										"text": " @dev Adds a new mint share to the contract\n @param _share The share structure containing recipient, amount, metric, and chips\n @notice Only callable on the main chain by the DAO admin\n @notice Reduces the left_share by the amount in _share\n @notice Increments the shares_index and adds the new share to the shares mapping\n @notice Emits an e_addShare event with the share details"
+									},
+									"functionSelector": "3b107e21",
+									"id": 162,
+									"implemented": false,
+									"kind": "function",
+									"modifiers": [],
+									"name": "addShare",
+									"nameLocation": "5725:8:0",
+									"nodeType": "FunctionDefinition",
+									"parameters": {
+										"id": 160,
+										"nodeType": "ParameterList",
+										"parameters": [
+											{
+												"constant": false,
+												"id": 159,
+												"mutability": "mutable",
+												"name": "_share",
+												"nameLocation": "5751:6:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 162,
+												"src": "5734:23:0",
+												"stateVariable": false,
+												"storageLocation": "calldata",
+												"typeDescriptions": {
+													"typeIdentifier": "t_struct$_s_share_$306_calldata_ptr",
+													"typeString": "struct s_share"
+												},
+												"typeName": {
+													"id": 158,
+													"nodeType": "UserDefinedTypeName",
+													"pathNode": {
+														"id": 157,
+														"name": "s_share",
+														"nameLocations": [
+															"5734:7:0"
+														],
+														"nodeType": "IdentifierPath",
+														"referencedDeclaration": 306,
+														"src": "5734:7:0"
+													},
+													"referencedDeclaration": 306,
+													"src": "5734:7:0",
+													"typeDescriptions": {
+														"typeIdentifier": "t_struct$_s_share_$306_storage_ptr",
+														"typeString": "struct s_share"
+													}
+												},
+												"visibility": "internal"
+											}
+										],
+										"src": "5733:25:0"
+									},
+									"returnParameters": {
+										"id": 161,
+										"nodeType": "ParameterList",
+										"parameters": [],
+										"src": "5767:0:0"
+									},
+									"scope": 297,
+									"src": "5716:52:0",
+									"stateMutability": "nonpayable",
+									"virtual": false,
+									"visibility": "external"
+								},
+								{
+									"documentation": {
+										"id": 163,
+										"nodeType": "StructuredDocumentation",
+										"src": "5773:98:0",
+										"text": " @dev  Burns the share at the specified index\n @param index index of share"
+									},
+									"functionSelector": "9241bda6",
+									"id": 168,
+									"implemented": false,
+									"kind": "function",
+									"modifiers": [],
+									"name": "burnShare",
+									"nameLocation": "5885:9:0",
+									"nodeType": "FunctionDefinition",
+									"parameters": {
+										"id": 166,
+										"nodeType": "ParameterList",
+										"parameters": [
+											{
+												"constant": false,
+												"id": 165,
+												"mutability": "mutable",
+												"name": "index",
+												"nameLocation": "5901:5:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 168,
+												"src": "5895:11:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_uint8",
+													"typeString": "uint8"
+												},
+												"typeName": {
+													"id": 164,
+													"name": "uint8",
+													"nodeType": "ElementaryTypeName",
+													"src": "5895:5:0",
+													"typeDescriptions": {
+														"typeIdentifier": "t_uint8",
+														"typeString": "uint8"
+													}
+												},
+												"visibility": "internal"
+											}
+										],
+										"src": "5894:13:0"
+									},
+									"returnParameters": {
+										"id": 167,
+										"nodeType": "ParameterList",
+										"parameters": [],
+										"src": "5916:0:0"
+									},
+									"scope": 297,
+									"src": "5876:41:0",
+									"stateMutability": "nonpayable",
+									"virtual": false,
+									"visibility": "external"
+								},
+								{
+									"documentation": {
+										"id": 169,
+										"nodeType": "StructuredDocumentation",
+										"src": "5922:96:0",
+										"text": " @dev  Mints a share at the specified index\n @param index index of share"
+									},
+									"functionSelector": "df876548",
+									"id": 174,
+									"implemented": false,
+									"kind": "function",
+									"modifiers": [],
+									"name": "shareMint",
+									"nameLocation": "6032:9:0",
+									"nodeType": "FunctionDefinition",
+									"parameters": {
+										"id": 172,
+										"nodeType": "ParameterList",
+										"parameters": [
+											{
+												"constant": false,
+												"id": 171,
+												"mutability": "mutable",
+												"name": "index",
+												"nameLocation": "6048:5:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 174,
+												"src": "6042:11:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_uint8",
+													"typeString": "uint8"
+												},
+												"typeName": {
+													"id": 170,
+													"name": "uint8",
+													"nodeType": "ElementaryTypeName",
+													"src": "6042:5:0",
+													"typeDescriptions": {
+														"typeIdentifier": "t_uint8",
+														"typeString": "uint8"
+													}
+												},
+												"visibility": "internal"
+											}
+										],
+										"src": "6041:13:0"
+									},
+									"returnParameters": {
+										"id": 173,
+										"nodeType": "ParameterList",
+										"parameters": [],
+										"src": "6063:0:0"
+									},
+									"scope": 297,
+									"src": "6023:41:0",
+									"stateMutability": "nonpayable",
+									"virtual": false,
+									"visibility": "external"
+								},
+								{
+									"documentation": {
+										"id": 175,
+										"nodeType": "StructuredDocumentation",
+										"src": "6069:85:0",
+										"text": " @dev how much cost to buy tts\n @param usdtamount usdt amount"
+									},
+									"functionSelector": "3a3099bb",
+									"id": 182,
+									"implemented": false,
+									"kind": "function",
+									"modifiers": [],
+									"name": "public_Sell",
+									"nameLocation": "6168:11:0",
+									"nodeType": "FunctionDefinition",
+									"parameters": {
+										"id": 180,
+										"nodeType": "ParameterList",
+										"parameters": [
+											{
+												"constant": false,
+												"id": 177,
+												"mutability": "mutable",
+												"name": "usdtamount",
+												"nameLocation": "6188:10:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 182,
+												"src": "6180:18:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_uint256",
+													"typeString": "uint256"
+												},
+												"typeName": {
+													"id": 176,
+													"name": "uint256",
+													"nodeType": "ElementaryTypeName",
+													"src": "6180:7:0",
+													"typeDescriptions": {
+														"typeIdentifier": "t_uint256",
+														"typeString": "uint256"
+													}
+												},
+												"visibility": "internal"
+											},
+											{
+												"constant": false,
+												"id": 179,
+												"mutability": "mutable",
+												"name": "data",
+												"nameLocation": "6213:4:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 182,
+												"src": "6200:17:0",
+												"stateVariable": false,
+												"storageLocation": "memory",
+												"typeDescriptions": {
+													"typeIdentifier": "t_bytes_memory_ptr",
+													"typeString": "bytes"
+												},
+												"typeName": {
+													"id": 178,
+													"name": "bytes",
+													"nodeType": "ElementaryTypeName",
+													"src": "6200:5:0",
+													"typeDescriptions": {
+														"typeIdentifier": "t_bytes_storage_ptr",
+														"typeString": "bytes"
+													}
+												},
+												"visibility": "internal"
+											}
+										],
+										"src": "6179:39:0"
+									},
+									"returnParameters": {
+										"id": 181,
+										"nodeType": "ParameterList",
+										"parameters": [],
+										"src": "6227:0:0"
+									},
+									"scope": 297,
+									"src": "6159:69:0",
+									"stateMutability": "nonpayable",
+									"virtual": false,
+									"visibility": "external"
+								},
+								{
+									"documentation": {
+										"id": 183,
+										"nodeType": "StructuredDocumentation",
+										"src": "6233:197:0",
+										"text": " @dev  Withdraws the specified amount from the public sale to the recipient\n @param amount admin tranfer public sell to another address\n @param recipent user's address"
+									},
+									"functionSelector": "e7b43e7d",
+									"id": 190,
+									"implemented": false,
+									"kind": "function",
+									"modifiers": [],
+									"name": "withdrawPublicSell",
+									"nameLocation": "6444:18:0",
+									"nodeType": "FunctionDefinition",
+									"parameters": {
+										"id": 188,
+										"nodeType": "ParameterList",
+										"parameters": [
+											{
+												"constant": false,
+												"id": 185,
+												"mutability": "mutable",
+												"name": "amount",
+												"nameLocation": "6471:6:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 190,
+												"src": "6463:14:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_uint256",
+													"typeString": "uint256"
+												},
+												"typeName": {
+													"id": 184,
+													"name": "uint256",
+													"nodeType": "ElementaryTypeName",
+													"src": "6463:7:0",
+													"typeDescriptions": {
+														"typeIdentifier": "t_uint256",
+														"typeString": "uint256"
+													}
+												},
+												"visibility": "internal"
+											},
+											{
+												"constant": false,
+												"id": 187,
+												"mutability": "mutable",
+												"name": "recipent",
+												"nameLocation": "6487:8:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 190,
+												"src": "6479:16:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_address",
+													"typeString": "address"
+												},
+												"typeName": {
+													"id": 186,
+													"name": "address",
+													"nodeType": "ElementaryTypeName",
+													"src": "6479:7:0",
+													"stateMutability": "nonpayable",
+													"typeDescriptions": {
+														"typeIdentifier": "t_address",
+														"typeString": "address"
+													}
+												},
+												"visibility": "internal"
+											}
+										],
+										"src": "6462:34:0"
+									},
+									"returnParameters": {
+										"id": 189,
+										"nodeType": "ParameterList",
+										"parameters": [],
+										"src": "6505:0:0"
+									},
+									"scope": 297,
+									"src": "6435:71:0",
+									"stateMutability": "nonpayable",
+									"virtual": false,
+									"visibility": "external"
+								},
+								{
+									"documentation": {
+										"id": 191,
+										"nodeType": "StructuredDocumentation",
+										"src": "6511:173:0",
+										"text": " @dev  Synchronizes the chain stake and returns the pool asset value\n @param chainid  the chain's id\n @param chainvalue the chain's stake value"
+									},
+									"functionSelector": "30fd6b29",
+									"id": 200,
+									"implemented": false,
+									"kind": "function",
+									"modifiers": [],
+									"name": "syncChainStake",
+									"nameLocation": "6698:14:0",
+									"nodeType": "FunctionDefinition",
+									"parameters": {
+										"id": 196,
+										"nodeType": "ParameterList",
+										"parameters": [
+											{
+												"constant": false,
+												"id": 193,
+												"mutability": "mutable",
+												"name": "chainid",
+												"nameLocation": "6729:7:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 200,
+												"src": "6722:14:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_uint32",
+													"typeString": "uint32"
+												},
+												"typeName": {
+													"id": 192,
+													"name": "uint32",
+													"nodeType": "ElementaryTypeName",
+													"src": "6722:6:0",
+													"typeDescriptions": {
+														"typeIdentifier": "t_uint32",
+														"typeString": "uint32"
+													}
+												},
+												"visibility": "internal"
+											},
+											{
+												"constant": false,
+												"id": 195,
+												"mutability": "mutable",
+												"name": "chainvalue",
+												"nameLocation": "6754:10:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 200,
+												"src": "6746:18:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_uint128",
+													"typeString": "uint128"
+												},
+												"typeName": {
+													"id": 194,
+													"name": "uint128",
+													"nodeType": "ElementaryTypeName",
+													"src": "6746:7:0",
+													"typeDescriptions": {
+														"typeIdentifier": "t_uint128",
+														"typeString": "uint128"
+													}
+												},
+												"visibility": "internal"
+											}
+										],
+										"src": "6712:58:0"
+									},
+									"returnParameters": {
+										"id": 199,
+										"nodeType": "ParameterList",
+										"parameters": [
+											{
+												"constant": false,
+												"id": 198,
+												"mutability": "mutable",
+												"name": "poolasset",
+												"nameLocation": "6797:9:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 200,
+												"src": "6789:17:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_uint128",
+													"typeString": "uint128"
+												},
+												"typeName": {
+													"id": 197,
+													"name": "uint128",
+													"nodeType": "ElementaryTypeName",
+													"src": "6789:7:0",
+													"typeDescriptions": {
+														"typeIdentifier": "t_uint128",
+														"typeString": "uint128"
+													}
+												},
+												"visibility": "internal"
+											}
+										],
+										"src": "6788:19:0"
+									},
+									"scope": 297,
+									"src": "6689:119:0",
+									"stateMutability": "nonpayable",
+									"virtual": false,
+									"visibility": "external"
+								},
+								{
+									"documentation": {
+										"id": 201,
+										"nodeType": "StructuredDocumentation",
+										"src": "6816:160:0",
+										"text": " @dev Synchronizes the pool asset with the specified amount to the subchain in stakepool\n @param amount the  amount will be Synchronizes"
+									},
+									"functionSelector": "6c0deba1",
+									"id": 206,
+									"implemented": false,
+									"kind": "function",
+									"modifiers": [],
+									"name": "syncPoolAsset",
+									"nameLocation": "6990:13:0",
+									"nodeType": "FunctionDefinition",
+									"parameters": {
+										"id": 204,
+										"nodeType": "ParameterList",
+										"parameters": [
+											{
+												"constant": false,
+												"id": 203,
+												"mutability": "mutable",
+												"name": "amount",
+												"nameLocation": "7012:6:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 206,
+												"src": "7004:14:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_uint128",
+													"typeString": "uint128"
+												},
+												"typeName": {
+													"id": 202,
+													"name": "uint128",
+													"nodeType": "ElementaryTypeName",
+													"src": "7004:7:0",
+													"typeDescriptions": {
+														"typeIdentifier": "t_uint128",
+														"typeString": "uint128"
+													}
+												},
+												"visibility": "internal"
+											}
+										],
+										"src": "7003:16:0"
+									},
+									"returnParameters": {
+										"id": 205,
+										"nodeType": "ParameterList",
+										"parameters": [],
+										"src": "7028:0:0"
+									},
+									"scope": 297,
+									"src": "6981:48:0",
+									"stateMutability": "nonpayable",
+									"virtual": false,
+									"visibility": "external"
+								},
+								{
+									"documentation": {
+										"id": 207,
+										"nodeType": "StructuredDocumentation",
+										"src": "7091:180:0",
+										"text": " @dev Withdraws the specified asset from the subchain to the recipient\n @param chainid the subchain id\n @param asset the asset amount will be withdraw"
+									},
+									"functionSelector": "c3bb7fff",
+									"id": 214,
+									"implemented": false,
+									"kind": "function",
+									"modifiers": [],
+									"name": "chain_withdraw",
+									"nameLocation": "7285:14:0",
+									"nodeType": "FunctionDefinition",
+									"parameters": {
+										"id": 212,
+										"nodeType": "ParameterList",
+										"parameters": [
+											{
+												"constant": false,
+												"id": 209,
+												"mutability": "mutable",
+												"name": "chainid",
+												"nameLocation": "7307:7:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 214,
+												"src": "7300:14:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_uint32",
+													"typeString": "uint32"
+												},
+												"typeName": {
+													"id": 208,
+													"name": "uint32",
+													"nodeType": "ElementaryTypeName",
+													"src": "7300:6:0",
+													"typeDescriptions": {
+														"typeIdentifier": "t_uint32",
+														"typeString": "uint32"
+													}
+												},
+												"visibility": "internal"
+											},
+											{
+												"constant": false,
+												"id": 211,
+												"mutability": "mutable",
+												"name": "asset",
+												"nameLocation": "7324:5:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 214,
+												"src": "7316:13:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_uint128",
+													"typeString": "uint128"
+												},
+												"typeName": {
+													"id": 210,
+													"name": "uint128",
+													"nodeType": "ElementaryTypeName",
+													"src": "7316:7:0",
+													"typeDescriptions": {
+														"typeIdentifier": "t_uint128",
+														"typeString": "uint128"
+													}
+												},
+												"visibility": "internal"
+											}
+										],
+										"src": "7299:31:0"
+									},
+									"returnParameters": {
+										"id": 213,
+										"nodeType": "ParameterList",
+										"parameters": [],
+										"src": "7339:0:0"
+									},
+									"scope": 297,
+									"src": "7276:64:0",
+									"stateMutability": "nonpayable",
+									"virtual": false,
+									"visibility": "external"
+								},
+								{
+									"documentation": {
+										"id": 215,
+										"nodeType": "StructuredDocumentation",
+										"src": "7399:177:0",
+										"text": " @dev Deposit the specified asset from the subchain to the recipient\n @param chainid the subchain id\n @param asset the asset amount will be deposit"
+									},
+									"functionSelector": "01bddf1b",
+									"id": 222,
+									"implemented": false,
+									"kind": "function",
+									"modifiers": [],
+									"name": "chain_deposit",
+									"nameLocation": "7590:13:0",
+									"nodeType": "FunctionDefinition",
+									"parameters": {
+										"id": 220,
+										"nodeType": "ParameterList",
+										"parameters": [
+											{
+												"constant": false,
+												"id": 217,
+												"mutability": "mutable",
+												"name": "chainid",
+												"nameLocation": "7611:7:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 222,
+												"src": "7604:14:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_uint32",
+													"typeString": "uint32"
+												},
+												"typeName": {
+													"id": 216,
+													"name": "uint32",
+													"nodeType": "ElementaryTypeName",
+													"src": "7604:6:0",
+													"typeDescriptions": {
+														"typeIdentifier": "t_uint32",
+														"typeString": "uint32"
+													}
+												},
+												"visibility": "internal"
+											},
+											{
+												"constant": false,
+												"id": 219,
+												"mutability": "mutable",
+												"name": "asset",
+												"nameLocation": "7628:5:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 222,
+												"src": "7620:13:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_uint128",
+													"typeString": "uint128"
+												},
+												"typeName": {
+													"id": 218,
+													"name": "uint128",
+													"nodeType": "ElementaryTypeName",
+													"src": "7620:7:0",
+													"typeDescriptions": {
+														"typeIdentifier": "t_uint128",
+														"typeString": "uint128"
+													}
+												},
+												"visibility": "internal"
+											}
+										],
+										"src": "7603:31:0"
+									},
+									"returnParameters": {
+										"id": 221,
+										"nodeType": "ParameterList",
+										"parameters": [],
+										"src": "7643:0:0"
+									},
+									"scope": 297,
+									"src": "7581:63:0",
+									"stateMutability": "nonpayable",
+									"virtual": false,
+									"visibility": "external"
+								},
+								{
+									"documentation": {
+										"id": 223,
+										"nodeType": "StructuredDocumentation",
+										"src": "7700:182:0",
+										"text": " @dev Withdraws the specified asset from the subchain to the recipient\n @param asset the asset amount will be withdraw\n @param recipient the asset owner"
+									},
+									"functionSelector": "0a4273e6",
+									"id": 230,
+									"implemented": false,
+									"kind": "function",
+									"modifiers": [],
+									"name": "subchainWithdraw",
+									"nameLocation": "7896:16:0",
+									"nodeType": "FunctionDefinition",
+									"parameters": {
+										"id": 228,
+										"nodeType": "ParameterList",
+										"parameters": [
+											{
+												"constant": false,
+												"id": 225,
+												"mutability": "mutable",
+												"name": "asset",
+												"nameLocation": "7921:5:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 230,
+												"src": "7913:13:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_uint128",
+													"typeString": "uint128"
+												},
+												"typeName": {
+													"id": 224,
+													"name": "uint128",
+													"nodeType": "ElementaryTypeName",
+													"src": "7913:7:0",
+													"typeDescriptions": {
+														"typeIdentifier": "t_uint128",
+														"typeString": "uint128"
+													}
+												},
+												"visibility": "internal"
+											},
+											{
+												"constant": false,
+												"id": 227,
+												"mutability": "mutable",
+												"name": "recipient",
+												"nameLocation": "7936:9:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 230,
+												"src": "7928:17:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_address",
+													"typeString": "address"
+												},
+												"typeName": {
+													"id": 226,
+													"name": "address",
+													"nodeType": "ElementaryTypeName",
+													"src": "7928:7:0",
+													"stateMutability": "nonpayable",
+													"typeDescriptions": {
+														"typeIdentifier": "t_address",
+														"typeString": "address"
+													}
+												},
+												"visibility": "internal"
+											}
+										],
+										"src": "7912:34:0"
+									},
+									"returnParameters": {
+										"id": 229,
+										"nodeType": "ParameterList",
+										"parameters": [],
+										"src": "7955:0:0"
+									},
+									"scope": 297,
+									"src": "7887:69:0",
+									"stateMutability": "nonpayable",
+									"virtual": false,
+									"visibility": "external"
+								},
+								{
+									"documentation": {
+										"id": 231,
+										"nodeType": "StructuredDocumentation",
+										"src": "7961:176:0",
+										"text": " @dev Deposits the specified asset to the subchain for the recipient\n @param asset the asset amount will be deposit\n @param recipient the receiver"
+									},
+									"functionSelector": "cd993b11",
+									"id": 238,
+									"implemented": false,
+									"kind": "function",
+									"modifiers": [],
+									"name": "subchainDeposit",
+									"nameLocation": "8151:15:0",
+									"nodeType": "FunctionDefinition",
+									"parameters": {
+										"id": 236,
+										"nodeType": "ParameterList",
+										"parameters": [
+											{
+												"constant": false,
+												"id": 233,
+												"mutability": "mutable",
+												"name": "asset",
+												"nameLocation": "8175:5:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 238,
+												"src": "8167:13:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_uint128",
+													"typeString": "uint128"
+												},
+												"typeName": {
+													"id": 232,
+													"name": "uint128",
+													"nodeType": "ElementaryTypeName",
+													"src": "8167:7:0",
+													"typeDescriptions": {
+														"typeIdentifier": "t_uint128",
+														"typeString": "uint128"
+													}
+												},
+												"visibility": "internal"
+											},
+											{
+												"constant": false,
+												"id": 235,
+												"mutability": "mutable",
+												"name": "recipient",
+												"nameLocation": "8190:9:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 238,
+												"src": "8182:17:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_address",
+													"typeString": "address"
+												},
+												"typeName": {
+													"id": 234,
+													"name": "address",
+													"nodeType": "ElementaryTypeName",
+													"src": "8182:7:0",
+													"stateMutability": "nonpayable",
+													"typeDescriptions": {
+														"typeIdentifier": "t_address",
+														"typeString": "address"
+													}
+												},
+												"visibility": "internal"
+											}
+										],
+										"src": "8166:34:0"
+									},
+									"returnParameters": {
+										"id": 237,
+										"nodeType": "ParameterList",
+										"parameters": [],
+										"src": "8209:0:0"
+									},
+									"scope": 297,
+									"src": "8142:68:0",
+									"stateMutability": "nonpayable",
+									"virtual": false,
+									"visibility": "external"
+								},
+								{
+									"documentation": {
+										"id": 239,
+										"nodeType": "StructuredDocumentation",
+										"src": "8218:168:0",
+										"text": " @dev Burns the specified value of tokens from the given account\n @param account the given account\n @param value the amount will be burned"
+									},
+									"functionSelector": "9dc29fac",
+									"id": 246,
+									"implemented": false,
+									"kind": "function",
+									"modifiers": [],
+									"name": "burn",
+									"nameLocation": "8400:4:0",
+									"nodeType": "FunctionDefinition",
+									"parameters": {
+										"id": 244,
+										"nodeType": "ParameterList",
+										"parameters": [
+											{
+												"constant": false,
+												"id": 241,
+												"mutability": "mutable",
+												"name": "account",
+												"nameLocation": "8413:7:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 246,
+												"src": "8405:15:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_address",
+													"typeString": "address"
+												},
+												"typeName": {
+													"id": 240,
+													"name": "address",
+													"nodeType": "ElementaryTypeName",
+													"src": "8405:7:0",
+													"stateMutability": "nonpayable",
+													"typeDescriptions": {
+														"typeIdentifier": "t_address",
+														"typeString": "address"
+													}
+												},
+												"visibility": "internal"
+											},
+											{
+												"constant": false,
+												"id": 243,
+												"mutability": "mutable",
+												"name": "value",
+												"nameLocation": "8430:5:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 246,
+												"src": "8422:13:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_uint256",
+													"typeString": "uint256"
+												},
+												"typeName": {
+													"id": 242,
+													"name": "uint256",
+													"nodeType": "ElementaryTypeName",
+													"src": "8422:7:0",
+													"typeDescriptions": {
+														"typeIdentifier": "t_uint256",
+														"typeString": "uint256"
+													}
+												},
+												"visibility": "internal"
+											}
+										],
+										"src": "8404:32:0"
+									},
+									"returnParameters": {
+										"id": 245,
+										"nodeType": "ParameterList",
+										"parameters": [],
+										"src": "8445:0:0"
+									},
+									"scope": 297,
+									"src": "8391:55:0",
+									"stateMutability": "nonpayable",
+									"virtual": false,
+									"visibility": "external"
+								},
+								{
+									"documentation": {
+										"id": 247,
+										"nodeType": "StructuredDocumentation",
+										"src": "8452:221:0",
+										"text": " @dev Adds or updates authorization for an address\n @param _auths The address to authorize\n @param _priv The privilege level to assign\n @notice Only the DAO admin can call this function"
+									},
+									"functionSelector": "542128dd",
+									"id": 254,
+									"implemented": false,
+									"kind": "function",
+									"modifiers": [],
+									"name": "addauths",
+									"nameLocation": "8687:8:0",
+									"nodeType": "FunctionDefinition",
+									"parameters": {
+										"id": 252,
+										"nodeType": "ParameterList",
+										"parameters": [
+											{
+												"constant": false,
+												"id": 249,
+												"mutability": "mutable",
+												"name": "_auths",
+												"nameLocation": "8704:6:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 254,
+												"src": "8696:14:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_address",
+													"typeString": "address"
+												},
+												"typeName": {
+													"id": 248,
+													"name": "address",
+													"nodeType": "ElementaryTypeName",
+													"src": "8696:7:0",
+													"stateMutability": "nonpayable",
+													"typeDescriptions": {
+														"typeIdentifier": "t_address",
+														"typeString": "address"
+													}
+												},
+												"visibility": "internal"
+											},
+											{
+												"constant": false,
+												"id": 251,
+												"mutability": "mutable",
+												"name": "_priv",
+												"nameLocation": "8720:5:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 254,
+												"src": "8712:13:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_uint256",
+													"typeString": "uint256"
+												},
+												"typeName": {
+													"id": 250,
+													"name": "uint256",
+													"nodeType": "ElementaryTypeName",
+													"src": "8712:7:0",
+													"typeDescriptions": {
+														"typeIdentifier": "t_uint256",
+														"typeString": "uint256"
+													}
+												},
+												"visibility": "internal"
+											}
+										],
+										"src": "8695:31:0"
+									},
+									"returnParameters": {
+										"id": 253,
+										"nodeType": "ParameterList",
+										"parameters": [],
+										"src": "8735:0:0"
+									},
+									"scope": 297,
+									"src": "8678:58:0",
+									"stateMutability": "nonpayable",
+									"virtual": false,
+									"visibility": "external"
+								},
+								{
+									"documentation": {
+										"id": 255,
+										"nodeType": "StructuredDocumentation",
+										"src": "8741:180:0",
+										"text": " @dev Removes authorization from an address\n @param _auths The address to remove authorization from\n @notice Only the DAO admin can call this function"
+									},
+									"functionSelector": "69a5ac32",
+									"id": 260,
+									"implemented": false,
+									"kind": "function",
+									"modifiers": [],
+									"name": "rmauths",
+									"nameLocation": "8935:7:0",
+									"nodeType": "FunctionDefinition",
+									"parameters": {
+										"id": 258,
+										"nodeType": "ParameterList",
+										"parameters": [
+											{
+												"constant": false,
+												"id": 257,
+												"mutability": "mutable",
+												"name": "_auths",
+												"nameLocation": "8951:6:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 260,
+												"src": "8943:14:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_address",
+													"typeString": "address"
+												},
+												"typeName": {
+													"id": 256,
+													"name": "address",
+													"nodeType": "ElementaryTypeName",
+													"src": "8943:7:0",
+													"stateMutability": "nonpayable",
+													"typeDescriptions": {
+														"typeIdentifier": "t_address",
+														"typeString": "address"
+													}
+												},
+												"visibility": "internal"
+											}
+										],
+										"src": "8942:16:0"
+									},
+									"returnParameters": {
+										"id": 259,
+										"nodeType": "ParameterList",
+										"parameters": [],
+										"src": "8967:0:0"
+									},
+									"scope": 297,
+									"src": "8926:42:0",
+									"stateMutability": "nonpayable",
+									"virtual": false,
+									"visibility": "external"
+								},
+								{
+									"documentation": {
+										"id": 261,
+										"nodeType": "StructuredDocumentation",
+										"src": "8973:150:0",
+										"text": "@notice Add a referral relationship\n @param user The address of the user being referred\n @param referral The address of the referrer"
+									},
+									"functionSelector": "eca93cce",
+									"id": 268,
+									"implemented": false,
+									"kind": "function",
+									"modifiers": [],
+									"name": "addreferral",
+									"nameLocation": "9137:11:0",
+									"nodeType": "FunctionDefinition",
+									"parameters": {
+										"id": 266,
+										"nodeType": "ParameterList",
+										"parameters": [
+											{
+												"constant": false,
+												"id": 263,
+												"mutability": "mutable",
+												"name": "user",
+												"nameLocation": "9157:4:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 268,
+												"src": "9149:12:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_address",
+													"typeString": "address"
+												},
+												"typeName": {
+													"id": 262,
+													"name": "address",
+													"nodeType": "ElementaryTypeName",
+													"src": "9149:7:0",
+													"stateMutability": "nonpayable",
+													"typeDescriptions": {
+														"typeIdentifier": "t_address",
+														"typeString": "address"
+													}
+												},
+												"visibility": "internal"
+											},
+											{
+												"constant": false,
+												"id": 265,
+												"mutability": "mutable",
+												"name": "referral",
+												"nameLocation": "9171:8:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 268,
+												"src": "9163:16:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_address",
+													"typeString": "address"
+												},
+												"typeName": {
+													"id": 264,
+													"name": "address",
+													"nodeType": "ElementaryTypeName",
+													"src": "9163:7:0",
+													"stateMutability": "nonpayable",
+													"typeDescriptions": {
+														"typeIdentifier": "t_address",
+														"typeString": "address"
+													}
+												},
+												"visibility": "internal"
+											}
+										],
+										"src": "9148:32:0"
+									},
+									"returnParameters": {
+										"id": 267,
+										"nodeType": "ParameterList",
+										"parameters": [],
+										"src": "9189:0:0"
+									},
+									"scope": 297,
+									"src": "9128:62:0",
+									"stateMutability": "nonpayable",
+									"virtual": false,
+									"visibility": "external"
+								},
+								{
+									"documentation": {
+										"id": 269,
+										"nodeType": "StructuredDocumentation",
+										"src": "9196:188:0",
+										"text": "@notice Stake tokens\n @param staker The address of the staker\n @param proofvalue The proof value for the stake\n @return construct The construct value after staking"
+									},
+									"functionSelector": "19f8d5b4",
+									"id": 278,
+									"implemented": false,
+									"kind": "function",
+									"modifiers": [],
+									"name": "stake",
+									"nameLocation": "9398:5:0",
+									"nodeType": "FunctionDefinition",
+									"parameters": {
+										"id": 274,
+										"nodeType": "ParameterList",
+										"parameters": [
+											{
+												"constant": false,
+												"id": 271,
+												"mutability": "mutable",
+												"name": "staker",
+												"nameLocation": "9421:6:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 278,
+												"src": "9413:14:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_address",
+													"typeString": "address"
+												},
+												"typeName": {
+													"id": 270,
+													"name": "address",
+													"nodeType": "ElementaryTypeName",
+													"src": "9413:7:0",
+													"stateMutability": "nonpayable",
+													"typeDescriptions": {
+														"typeIdentifier": "t_address",
+														"typeString": "address"
+													}
+												},
+												"visibility": "internal"
+											},
+											{
+												"constant": false,
+												"id": 273,
+												"mutability": "mutable",
+												"name": "proofvalue",
+												"nameLocation": "9445:10:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 278,
+												"src": "9437:18:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_uint128",
+													"typeString": "uint128"
+												},
+												"typeName": {
+													"id": 272,
+													"name": "uint128",
+													"nodeType": "ElementaryTypeName",
+													"src": "9437:7:0",
+													"typeDescriptions": {
+														"typeIdentifier": "t_uint128",
+														"typeString": "uint128"
+													}
+												},
+												"visibility": "internal"
+											}
+										],
+										"src": "9403:58:0"
+									},
+									"returnParameters": {
+										"id": 277,
+										"nodeType": "ParameterList",
+										"parameters": [
+											{
+												"constant": false,
+												"id": 276,
+												"mutability": "mutable",
+												"name": "construct",
+												"nameLocation": "9488:9:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 278,
+												"src": "9480:17:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_uint128",
+													"typeString": "uint128"
+												},
+												"typeName": {
+													"id": 275,
+													"name": "uint128",
+													"nodeType": "ElementaryTypeName",
+													"src": "9480:7:0",
+													"typeDescriptions": {
+														"typeIdentifier": "t_uint128",
+														"typeString": "uint128"
+													}
+												},
+												"visibility": "internal"
+											}
+										],
+										"src": "9479:19:0"
+									},
+									"scope": 297,
+									"src": "9389:110:0",
+									"stateMutability": "nonpayable",
+									"virtual": false,
+									"visibility": "external"
+								},
+								{
+									"documentation": {
+										"id": 279,
+										"nodeType": "StructuredDocumentation",
+										"src": "9505:130:0",
+										"text": "@notice Unstake tokens\n @param staker The address of the staker\n @param proofvalue The proof value for unstaking"
+									},
+									"functionSelector": "7bd3ca35",
+									"id": 286,
+									"implemented": false,
+									"kind": "function",
+									"modifiers": [],
+									"name": "unstake",
+									"nameLocation": "9649:7:0",
+									"nodeType": "FunctionDefinition",
+									"parameters": {
+										"id": 284,
+										"nodeType": "ParameterList",
+										"parameters": [
+											{
+												"constant": false,
+												"id": 281,
+												"mutability": "mutable",
+												"name": "staker",
+												"nameLocation": "9665:6:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 286,
+												"src": "9657:14:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_address",
+													"typeString": "address"
+												},
+												"typeName": {
+													"id": 280,
+													"name": "address",
+													"nodeType": "ElementaryTypeName",
+													"src": "9657:7:0",
+													"stateMutability": "nonpayable",
+													"typeDescriptions": {
+														"typeIdentifier": "t_address",
+														"typeString": "address"
+													}
+												},
+												"visibility": "internal"
+											},
+											{
+												"constant": false,
+												"id": 283,
+												"mutability": "mutable",
+												"name": "proofvalue",
+												"nameLocation": "9681:10:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 286,
+												"src": "9673:18:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_uint128",
+													"typeString": "uint128"
+												},
+												"typeName": {
+													"id": 282,
+													"name": "uint128",
+													"nodeType": "ElementaryTypeName",
+													"src": "9673:7:0",
+													"typeDescriptions": {
+														"typeIdentifier": "t_uint128",
+														"typeString": "uint128"
+													}
+												},
+												"visibility": "internal"
+											}
+										],
+										"src": "9656:36:0"
+									},
+									"returnParameters": {
+										"id": 285,
+										"nodeType": "ParameterList",
+										"parameters": [],
+										"src": "9701:0:0"
+									},
+									"scope": 297,
+									"src": "9640:62:0",
+									"stateMutability": "nonpayable",
+									"virtual": false,
+									"visibility": "external"
+								},
+								{
+									"documentation": {
+										"id": 287,
+										"nodeType": "StructuredDocumentation",
+										"src": "9708:218:0",
+										"text": "@notice Get the DAO admin and referral for a customer\n @param _customer The address of the customer\n @return dba_admin The address of the DAO admin\n @return referral The address of the referrer"
+									},
+									"functionSelector": "b88e6d63",
+									"id": 296,
+									"implemented": false,
+									"kind": "function",
+									"modifiers": [],
+									"name": "getreferralanddaoadmin",
+									"nameLocation": "9940:22:0",
+									"nodeType": "FunctionDefinition",
+									"parameters": {
+										"id": 290,
+										"nodeType": "ParameterList",
+										"parameters": [
+											{
+												"constant": false,
+												"id": 289,
+												"mutability": "mutable",
+												"name": "_customer",
+												"nameLocation": "9980:9:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 296,
+												"src": "9972:17:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_address",
+													"typeString": "address"
+												},
+												"typeName": {
+													"id": 288,
+													"name": "address",
+													"nodeType": "ElementaryTypeName",
+													"src": "9972:7:0",
+													"stateMutability": "nonpayable",
+													"typeDescriptions": {
+														"typeIdentifier": "t_address",
+														"typeString": "address"
+													}
+												},
+												"visibility": "internal"
+											}
+										],
+										"src": "9962:33:0"
+									},
+									"returnParameters": {
+										"id": 295,
+										"nodeType": "ParameterList",
+										"parameters": [
+											{
+												"constant": false,
+												"id": 292,
+												"mutability": "mutable",
+												"name": "dba_admin",
+												"nameLocation": "10027:9:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 296,
+												"src": "10019:17:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_address",
+													"typeString": "address"
+												},
+												"typeName": {
+													"id": 291,
+													"name": "address",
+													"nodeType": "ElementaryTypeName",
+													"src": "10019:7:0",
+													"stateMutability": "nonpayable",
+													"typeDescriptions": {
+														"typeIdentifier": "t_address",
+														"typeString": "address"
+													}
+												},
+												"visibility": "internal"
+											},
+											{
+												"constant": false,
+												"id": 294,
+												"mutability": "mutable",
+												"name": "referral",
+												"nameLocation": "10046:8:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 296,
+												"src": "10038:16:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_address",
+													"typeString": "address"
+												},
+												"typeName": {
+													"id": 293,
+													"name": "address",
+													"nodeType": "ElementaryTypeName",
+													"src": "10038:7:0",
+													"stateMutability": "nonpayable",
+													"typeDescriptions": {
+														"typeIdentifier": "t_address",
+														"typeString": "address"
+													}
+												},
+												"visibility": "internal"
+											}
+										],
+										"src": "10018:37:0"
+									},
+									"scope": 297,
+									"src": "9931:125:0",
+									"stateMutability": "view",
+									"virtual": false,
+									"visibility": "external"
+								}
+							],
+							"scope": 319,
+							"src": "149:9909:0",
+							"usedErrors": [],
+							"usedEvents": [
+								9,
+								18,
+								23,
+								30,
+								35,
+								48,
+								53,
+								60,
+								67,
+								76,
+								89,
+								94
+							]
+						},
+						{
+							"canonicalName": "s_share",
+							"id": 306,
+							"members": [
+								{
+									"constant": false,
+									"id": 299,
+									"mutability": "mutable",
+									"name": "recipient",
+									"nameLocation": "10088:9:0",
+									"nodeType": "VariableDeclaration",
+									"scope": 306,
+									"src": "10080:17:0",
+									"stateVariable": false,
+									"storageLocation": "default",
+									"typeDescriptions": {
+										"typeIdentifier": "t_address",
+										"typeString": "address"
+									},
+									"typeName": {
+										"id": 298,
+										"name": "address",
+										"nodeType": "ElementaryTypeName",
+										"src": "10080:7:0",
+										"stateMutability": "nonpayable",
+										"typeDescriptions": {
+											"typeIdentifier": "t_address",
+											"typeString": "address"
+										}
+									},
+									"visibility": "internal"
+								},
+								{
+									"constant": false,
+									"id": 301,
+									"mutability": "mutable",
+									"name": "leftamount",
+									"nameLocation": "10119:10:0",
+									"nodeType": "VariableDeclaration",
+									"scope": 306,
+									"src": "10111:18:0",
+									"stateVariable": false,
+									"storageLocation": "default",
+									"typeDescriptions": {
+										"typeIdentifier": "t_uint128",
+										"typeString": "uint128"
+									},
+									"typeName": {
+										"id": 300,
+										"name": "uint128",
+										"nodeType": "ElementaryTypeName",
+										"src": "10111:7:0",
+										"typeDescriptions": {
+											"typeIdentifier": "t_uint128",
+											"typeString": "uint128"
+										}
+									},
+									"visibility": "internal"
+								},
+								{
+									"constant": false,
+									"id": 303,
+									"mutability": "mutable",
+									"name": "metric",
+									"nameLocation": "10160:6:0",
+									"nodeType": "VariableDeclaration",
+									"scope": 306,
+									"src": "10152:14:0",
+									"stateVariable": false,
+									"storageLocation": "default",
+									"typeDescriptions": {
+										"typeIdentifier": "t_uint120",
+										"typeString": "uint120"
+									},
+									"typeName": {
+										"id": 302,
+										"name": "uint120",
+										"nodeType": "ElementaryTypeName",
+										"src": "10152:7:0",
+										"typeDescriptions": {
+											"typeIdentifier": "t_uint120",
+											"typeString": "uint120"
+										}
+									},
+									"visibility": "internal"
+								},
+								{
+									"constant": false,
+									"id": 305,
+									"mutability": "mutable",
+									"name": "chips",
+									"nameLocation": "10201:5:0",
+									"nodeType": "VariableDeclaration",
+									"scope": 306,
+									"src": "10195:11:0",
+									"stateVariable": false,
+									"storageLocation": "default",
+									"typeDescriptions": {
+										"typeIdentifier": "t_uint8",
+										"typeString": "uint8"
+									},
+									"typeName": {
+										"id": 304,
+										"name": "uint8",
+										"nodeType": "ElementaryTypeName",
+										"src": "10195:5:0",
+										"typeDescriptions": {
+											"typeIdentifier": "t_uint8",
+											"typeString": "uint8"
+										}
+									},
+									"visibility": "internal"
+								}
+							],
+							"name": "s_share",
+							"nameLocation": "10066:7:0",
+							"nodeType": "StructDefinition",
+							"scope": 319,
+							"src": "10059:211:0",
+							"visibility": "public"
+						},
+						{
+							"canonicalName": "s_chain",
+							"id": 313,
+							"members": [
+								{
+									"constant": false,
+									"id": 308,
+									"mutability": "mutable",
+									"name": "asset",
+									"nameLocation": "10301:5:0",
+									"nodeType": "VariableDeclaration",
+									"scope": 313,
+									"src": "10293:13:0",
+									"stateVariable": false,
+									"storageLocation": "default",
+									"typeDescriptions": {
+										"typeIdentifier": "t_uint256",
+										"typeString": "uint256"
+									},
+									"typeName": {
+										"id": 307,
+										"name": "uint256",
+										"nodeType": "ElementaryTypeName",
+										"src": "10293:7:0",
+										"typeDescriptions": {
+											"typeIdentifier": "t_uint256",
+											"typeString": "uint256"
+										}
+									},
+									"visibility": "internal"
+								},
+								{
+									"constant": false,
+									"id": 310,
+									"mutability": "mutable",
+									"name": "proofstate",
+									"nameLocation": "10361:10:0",
+									"nodeType": "VariableDeclaration",
+									"scope": 313,
+									"src": "10353:18:0",
+									"stateVariable": false,
+									"storageLocation": "default",
+									"typeDescriptions": {
+										"typeIdentifier": "t_uint256",
+										"typeString": "uint256"
+									},
+									"typeName": {
+										"id": 309,
+										"name": "uint256",
+										"nodeType": "ElementaryTypeName",
+										"src": "10353:7:0",
+										"typeDescriptions": {
+											"typeIdentifier": "t_uint256",
+											"typeString": "uint256"
+										}
+									},
+									"visibility": "internal"
+								},
+								{
+									"constant": false,
+									"id": 312,
+									"mutability": "mutable",
+									"name": "recipient",
+									"nameLocation": "10416:9:0",
+									"nodeType": "VariableDeclaration",
+									"scope": 313,
+									"src": "10408:17:0",
+									"stateVariable": false,
+									"storageLocation": "default",
+									"typeDescriptions": {
+										"typeIdentifier": "t_address",
+										"typeString": "address"
+									},
+									"typeName": {
+										"id": 311,
+										"name": "address",
+										"nodeType": "ElementaryTypeName",
+										"src": "10408:7:0",
+										"stateMutability": "nonpayable",
+										"typeDescriptions": {
+											"typeIdentifier": "t_address",
+											"typeString": "address"
+										}
+									},
+									"visibility": "internal"
+								}
+							],
+							"name": "s_chain",
+							"nameLocation": "10279:7:0",
+							"nodeType": "StructDefinition",
+							"scope": 319,
+							"src": "10272:156:0",
+							"visibility": "public"
+						},
+						{
+							"canonicalName": "s_proof",
+							"id": 318,
+							"members": [
+								{
+									"constant": false,
+									"id": 315,
+									"mutability": "mutable",
+									"name": "fromcontract",
+									"nameLocation": "10458:12:0",
+									"nodeType": "VariableDeclaration",
+									"scope": 318,
+									"src": "10450:20:0",
+									"stateVariable": false,
+									"storageLocation": "default",
+									"typeDescriptions": {
+										"typeIdentifier": "t_address",
+										"typeString": "address"
+									},
+									"typeName": {
+										"id": 314,
+										"name": "address",
+										"nodeType": "ElementaryTypeName",
+										"src": "10450:7:0",
+										"stateMutability": "nonpayable",
+										"typeDescriptions": {
+											"typeIdentifier": "t_address",
+											"typeString": "address"
+										}
+									},
+									"visibility": "internal"
+								},
+								{
+									"constant": false,
+									"id": 317,
+									"mutability": "mutable",
+									"name": "proofstate",
+									"nameLocation": "10507:10:0",
+									"nodeType": "VariableDeclaration",
+									"scope": 318,
+									"src": "10499:18:0",
+									"stateVariable": false,
+									"storageLocation": "default",
+									"typeDescriptions": {
+										"typeIdentifier": "t_uint256",
+										"typeString": "uint256"
+									},
+									"typeName": {
+										"id": 316,
+										"name": "uint256",
+										"nodeType": "ElementaryTypeName",
+										"src": "10499:7:0",
+										"typeDescriptions": {
+											"typeIdentifier": "t_uint256",
+											"typeString": "uint256"
+										}
+									},
+									"visibility": "internal"
+								}
+							],
+							"name": "s_proof",
+							"nameLocation": "10436:7:0",
+							"nodeType": "StructDefinition",
+							"scope": 319,
+							"src": "10429:143:0",
+							"visibility": "public"
+						}
+					],
+					"src": "32:10541:0"
+				},
+				"id": 0
+			}
+		}
+	}
+}

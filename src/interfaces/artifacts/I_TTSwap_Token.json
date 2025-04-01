@@ -1,0 +1,813 @@
+{
+	"deploy": {
+		"VM:-": {
+			"linkReferences": {},
+			"autoDeployLib": true
+		},
+		"main:1": {
+			"linkReferences": {},
+			"autoDeployLib": true
+		},
+		"ropsten:3": {
+			"linkReferences": {},
+			"autoDeployLib": true
+		},
+		"rinkeby:4": {
+			"linkReferences": {},
+			"autoDeployLib": true
+		},
+		"kovan:42": {
+			"linkReferences": {},
+			"autoDeployLib": true
+		},
+		"goerli:5": {
+			"linkReferences": {},
+			"autoDeployLib": true
+		},
+		"Custom": {
+			"linkReferences": {},
+			"autoDeployLib": true
+		}
+	},
+	"data": {
+		"bytecode": {
+			"functionDebugData": {},
+			"generatedSources": [],
+			"linkReferences": {},
+			"object": "",
+			"opcodes": "",
+			"sourceMap": ""
+		},
+		"deployedBytecode": {
+			"functionDebugData": {},
+			"generatedSources": [],
+			"immutableReferences": {},
+			"linkReferences": {},
+			"object": "",
+			"opcodes": "",
+			"sourceMap": ""
+		},
+		"gasEstimates": null,
+		"methodIdentifiers": {
+			"addShare((address,uint128,uint120,uint8))": "3b107e21",
+			"addauths(address,uint256)": "542128dd",
+			"addreferral(address,address)": "eca93cce",
+			"auths(address)": "64e72dbd",
+			"burn(address,uint256)": "9dc29fac",
+			"burnShare(uint8)": "9241bda6",
+			"chain_deposit(uint32,uint128)": "01bddf1b",
+			"chain_withdraw(uint32,uint128)": "c3bb7fff",
+			"changeDAOAdmin(address)": "3cba316b",
+			"dao_admin()": "a538e6a9",
+			"getreferralanddaoadmin(address)": "b88e6d63",
+			"marketcontract()": "2bf960da",
+			"normalgoodid()": "02517e8b",
+			"public_Sell(uint256,bytes)": "3a3099bb",
+			"publicsell()": "de5712d4",
+			"referrals(address)": "9ca423b3",
+			"rmauths(address)": "69a5ac32",
+			"setEnv(address,address,address)": "fa82add5",
+			"shareMint(uint8)": "df876548",
+			"stake(address,uint128)": "19f8d5b4",
+			"subchainDeposit(uint128,address)": "cd993b11",
+			"subchainWithdraw(uint128,address)": "0a4273e6",
+			"syncChainStake(uint32,uint128)": "30fd6b29",
+			"syncPoolAsset(uint128)": "6c0deba1",
+			"unstake(address,uint128)": "7bd3ca35",
+			"valuegoodid()": "f35da462",
+			"withdrawPublicSell(uint256,address)": "e7b43e7d"
+		}
+	},
+	"abi": [
+		{
+			"anonymous": false,
+			"inputs": [
+				{
+					"indexed": false,
+					"internalType": "address",
+					"name": "recipient",
+					"type": "address"
+				},
+				{
+					"indexed": false,
+					"internalType": "uint256",
+					"name": "leftamount",
+					"type": "uint256"
+				},
+				{
+					"indexed": false,
+					"internalType": "uint120",
+					"name": "metric",
+					"type": "uint120"
+				},
+				{
+					"indexed": false,
+					"internalType": "uint8",
+					"name": "chips",
+					"type": "uint8"
+				},
+				{
+					"indexed": false,
+					"internalType": "uint32",
+					"name": "index",
+					"type": "uint32"
+				}
+			],
+			"name": "e_addShare",
+			"type": "event"
+		},
+		{
+			"anonymous": false,
+			"inputs": [
+				{
+					"indexed": false,
+					"internalType": "address",
+					"name": "auths",
+					"type": "address"
+				},
+				{
+					"indexed": false,
+					"internalType": "uint256",
+					"name": "priv",
+					"type": "uint256"
+				}
+			],
+			"name": "e_addauths",
+			"type": "event"
+		},
+		{
+			"anonymous": false,
+			"inputs": [
+				{
+					"indexed": false,
+					"internalType": "address",
+					"name": "users",
+					"type": "address"
+				},
+				{
+					"indexed": false,
+					"internalType": "address",
+					"name": "referral",
+					"type": "address"
+				}
+			],
+			"name": "e_addreferral",
+			"type": "event"
+		},
+		{
+			"anonymous": false,
+			"inputs": [
+				{
+					"indexed": false,
+					"internalType": "uint32",
+					"name": "index",
+					"type": "uint32"
+				}
+			],
+			"name": "e_burnShare",
+			"type": "event"
+		},
+		{
+			"anonymous": false,
+			"inputs": [
+				{
+					"indexed": false,
+					"internalType": "uint256",
+					"name": "usdtamount",
+					"type": "uint256"
+				},
+				{
+					"indexed": false,
+					"internalType": "uint256",
+					"name": "ttsamount",
+					"type": "uint256"
+				}
+			],
+			"name": "e_publicsell",
+			"type": "event"
+		},
+		{
+			"anonymous": false,
+			"inputs": [
+				{
+					"indexed": false,
+					"internalType": "address",
+					"name": "auths",
+					"type": "address"
+				}
+			],
+			"name": "e_rmauths",
+			"type": "event"
+		},
+		{
+			"anonymous": false,
+			"inputs": [
+				{
+					"indexed": false,
+					"internalType": "address",
+					"name": "recipient",
+					"type": "address"
+				}
+			],
+			"name": "e_setdaoadmin",
+			"type": "event"
+		},
+		{
+			"anonymous": false,
+			"inputs": [
+				{
+					"indexed": false,
+					"internalType": "address",
+					"name": "normalgoodid",
+					"type": "address"
+				},
+				{
+					"indexed": false,
+					"internalType": "address",
+					"name": "valuegoodid",
+					"type": "address"
+				},
+				{
+					"indexed": false,
+					"internalType": "address",
+					"name": "marketcontract",
+					"type": "address"
+				}
+			],
+			"name": "e_setenv",
+			"type": "event"
+		},
+		{
+			"anonymous": false,
+			"inputs": [
+				{
+					"indexed": false,
+					"internalType": "uint128",
+					"name": "mintamount",
+					"type": "uint128"
+				},
+				{
+					"indexed": false,
+					"internalType": "uint32",
+					"name": "index",
+					"type": "uint32"
+				}
+			],
+			"name": "e_shareMint",
+			"type": "event"
+		},
+		{
+			"anonymous": false,
+			"inputs": [
+				{
+					"indexed": false,
+					"internalType": "uint32",
+					"name": "chain",
+					"type": "uint32"
+				},
+				{
+					"indexed": false,
+					"internalType": "uint128",
+					"name": "poolasset",
+					"type": "uint128"
+				},
+				{
+					"indexed": false,
+					"internalType": "uint256",
+					"name": "proofstate",
+					"type": "uint256"
+				}
+			],
+			"name": "e_syncChainStake",
+			"type": "event"
+		},
+		{
+			"anonymous": false,
+			"inputs": [
+				{
+					"indexed": false,
+					"internalType": "address",
+					"name": "recipient",
+					"type": "address"
+				},
+				{
+					"indexed": false,
+					"internalType": "uint256",
+					"name": "proofvalue",
+					"type": "uint256"
+				},
+				{
+					"indexed": false,
+					"internalType": "uint256",
+					"name": "unstakestate",
+					"type": "uint256"
+				},
+				{
+					"indexed": false,
+					"internalType": "uint256",
+					"name": "stakestate",
+					"type": "uint256"
+				},
+				{
+					"indexed": false,
+					"internalType": "uint256",
+					"name": "poolstate",
+					"type": "uint256"
+				}
+			],
+			"name": "e_unstake",
+			"type": "event"
+		},
+		{
+			"anonymous": false,
+			"inputs": [
+				{
+					"indexed": false,
+					"internalType": "uint256",
+					"name": "poolstate",
+					"type": "uint256"
+				}
+			],
+			"name": "e_updatepool",
+			"type": "event"
+		},
+		{
+			"inputs": [
+				{
+					"components": [
+						{
+							"internalType": "address",
+							"name": "recipient",
+							"type": "address"
+						},
+						{
+							"internalType": "uint128",
+							"name": "leftamount",
+							"type": "uint128"
+						},
+						{
+							"internalType": "uint120",
+							"name": "metric",
+							"type": "uint120"
+						},
+						{
+							"internalType": "uint8",
+							"name": "chips",
+							"type": "uint8"
+						}
+					],
+					"internalType": "struct s_share",
+					"name": "_share",
+					"type": "tuple"
+				}
+			],
+			"name": "addShare",
+			"outputs": [],
+			"stateMutability": "nonpayable",
+			"type": "function"
+		},
+		{
+			"inputs": [
+				{
+					"internalType": "address",
+					"name": "_auths",
+					"type": "address"
+				},
+				{
+					"internalType": "uint256",
+					"name": "_priv",
+					"type": "uint256"
+				}
+			],
+			"name": "addauths",
+			"outputs": [],
+			"stateMutability": "nonpayable",
+			"type": "function"
+		},
+		{
+			"inputs": [
+				{
+					"internalType": "address",
+					"name": "user",
+					"type": "address"
+				},
+				{
+					"internalType": "address",
+					"name": "referral",
+					"type": "address"
+				}
+			],
+			"name": "addreferral",
+			"outputs": [],
+			"stateMutability": "nonpayable",
+			"type": "function"
+		},
+		{
+			"inputs": [
+				{
+					"internalType": "address",
+					"name": "recipent",
+					"type": "address"
+				}
+			],
+			"name": "auths",
+			"outputs": [
+				{
+					"internalType": "uint256",
+					"name": "_auth",
+					"type": "uint256"
+				}
+			],
+			"stateMutability": "view",
+			"type": "function"
+		},
+		{
+			"inputs": [
+				{
+					"internalType": "address",
+					"name": "account",
+					"type": "address"
+				},
+				{
+					"internalType": "uint256",
+					"name": "value",
+					"type": "uint256"
+				}
+			],
+			"name": "burn",
+			"outputs": [],
+			"stateMutability": "nonpayable",
+			"type": "function"
+		},
+		{
+			"inputs": [
+				{
+					"internalType": "uint8",
+					"name": "index",
+					"type": "uint8"
+				}
+			],
+			"name": "burnShare",
+			"outputs": [],
+			"stateMutability": "nonpayable",
+			"type": "function"
+		},
+		{
+			"inputs": [
+				{
+					"internalType": "uint32",
+					"name": "chainid",
+					"type": "uint32"
+				},
+				{
+					"internalType": "uint128",
+					"name": "asset",
+					"type": "uint128"
+				}
+			],
+			"name": "chain_deposit",
+			"outputs": [],
+			"stateMutability": "nonpayable",
+			"type": "function"
+		},
+		{
+			"inputs": [
+				{
+					"internalType": "uint32",
+					"name": "chainid",
+					"type": "uint32"
+				},
+				{
+					"internalType": "uint128",
+					"name": "asset",
+					"type": "uint128"
+				}
+			],
+			"name": "chain_withdraw",
+			"outputs": [],
+			"stateMutability": "nonpayable",
+			"type": "function"
+		},
+		{
+			"inputs": [
+				{
+					"internalType": "address",
+					"name": "_recipient",
+					"type": "address"
+				}
+			],
+			"name": "changeDAOAdmin",
+			"outputs": [],
+			"stateMutability": "nonpayable",
+			"type": "function"
+		},
+		{
+			"inputs": [],
+			"name": "dao_admin",
+			"outputs": [
+				{
+					"internalType": "address",
+					"name": "_dao_admin",
+					"type": "address"
+				}
+			],
+			"stateMutability": "view",
+			"type": "function"
+		},
+		{
+			"inputs": [
+				{
+					"internalType": "address",
+					"name": "_customer",
+					"type": "address"
+				}
+			],
+			"name": "getreferralanddaoadmin",
+			"outputs": [
+				{
+					"internalType": "address",
+					"name": "dba_admin",
+					"type": "address"
+				},
+				{
+					"internalType": "address",
+					"name": "referral",
+					"type": "address"
+				}
+			],
+			"stateMutability": "view",
+			"type": "function"
+		},
+		{
+			"inputs": [],
+			"name": "marketcontract",
+			"outputs": [
+				{
+					"internalType": "address",
+					"name": "_marketcontract",
+					"type": "address"
+				}
+			],
+			"stateMutability": "view",
+			"type": "function"
+		},
+		{
+			"inputs": [],
+			"name": "normalgoodid",
+			"outputs": [
+				{
+					"internalType": "address",
+					"name": "_normalgoodid",
+					"type": "address"
+				}
+			],
+			"stateMutability": "view",
+			"type": "function"
+		},
+		{
+			"inputs": [
+				{
+					"internalType": "uint256",
+					"name": "usdtamount",
+					"type": "uint256"
+				},
+				{
+					"internalType": "bytes",
+					"name": "data",
+					"type": "bytes"
+				}
+			],
+			"name": "public_Sell",
+			"outputs": [],
+			"stateMutability": "nonpayable",
+			"type": "function"
+		},
+		{
+			"inputs": [],
+			"name": "publicsell",
+			"outputs": [
+				{
+					"internalType": "uint128",
+					"name": "_publicsell",
+					"type": "uint128"
+				}
+			],
+			"stateMutability": "view",
+			"type": "function"
+		},
+		{
+			"inputs": [
+				{
+					"internalType": "address",
+					"name": "_recipent",
+					"type": "address"
+				}
+			],
+			"name": "referrals",
+			"outputs": [
+				{
+					"internalType": "address",
+					"name": "_referral",
+					"type": "address"
+				}
+			],
+			"stateMutability": "view",
+			"type": "function"
+		},
+		{
+			"inputs": [
+				{
+					"internalType": "address",
+					"name": "_auths",
+					"type": "address"
+				}
+			],
+			"name": "rmauths",
+			"outputs": [],
+			"stateMutability": "nonpayable",
+			"type": "function"
+		},
+		{
+			"inputs": [
+				{
+					"internalType": "address",
+					"name": "_normalgoodid",
+					"type": "address"
+				},
+				{
+					"internalType": "address",
+					"name": "_valuegoodid",
+					"type": "address"
+				},
+				{
+					"internalType": "address",
+					"name": "_marketcontract",
+					"type": "address"
+				}
+			],
+			"name": "setEnv",
+			"outputs": [],
+			"stateMutability": "nonpayable",
+			"type": "function"
+		},
+		{
+			"inputs": [
+				{
+					"internalType": "uint8",
+					"name": "index",
+					"type": "uint8"
+				}
+			],
+			"name": "shareMint",
+			"outputs": [],
+			"stateMutability": "nonpayable",
+			"type": "function"
+		},
+		{
+			"inputs": [
+				{
+					"internalType": "address",
+					"name": "staker",
+					"type": "address"
+				},
+				{
+					"internalType": "uint128",
+					"name": "proofvalue",
+					"type": "uint128"
+				}
+			],
+			"name": "stake",
+			"outputs": [
+				{
+					"internalType": "uint128",
+					"name": "construct",
+					"type": "uint128"
+				}
+			],
+			"stateMutability": "nonpayable",
+			"type": "function"
+		},
+		{
+			"inputs": [
+				{
+					"internalType": "uint128",
+					"name": "asset",
+					"type": "uint128"
+				},
+				{
+					"internalType": "address",
+					"name": "recipient",
+					"type": "address"
+				}
+			],
+			"name": "subchainDeposit",
+			"outputs": [],
+			"stateMutability": "nonpayable",
+			"type": "function"
+		},
+		{
+			"inputs": [
+				{
+					"internalType": "uint128",
+					"name": "asset",
+					"type": "uint128"
+				},
+				{
+					"internalType": "address",
+					"name": "recipient",
+					"type": "address"
+				}
+			],
+			"name": "subchainWithdraw",
+			"outputs": [],
+			"stateMutability": "nonpayable",
+			"type": "function"
+		},
+		{
+			"inputs": [
+				{
+					"internalType": "uint32",
+					"name": "chainid",
+					"type": "uint32"
+				},
+				{
+					"internalType": "uint128",
+					"name": "chainvalue",
+					"type": "uint128"
+				}
+			],
+			"name": "syncChainStake",
+			"outputs": [
+				{
+					"internalType": "uint128",
+					"name": "poolasset",
+					"type": "uint128"
+				}
+			],
+			"stateMutability": "nonpayable",
+			"type": "function"
+		},
+		{
+			"inputs": [
+				{
+					"internalType": "uint128",
+					"name": "amount",
+					"type": "uint128"
+				}
+			],
+			"name": "syncPoolAsset",
+			"outputs": [],
+			"stateMutability": "nonpayable",
+			"type": "function"
+		},
+		{
+			"inputs": [
+				{
+					"internalType": "address",
+					"name": "staker",
+					"type": "address"
+				},
+				{
+					"internalType": "uint128",
+					"name": "proofvalue",
+					"type": "uint128"
+				}
+			],
+			"name": "unstake",
+			"outputs": [],
+			"stateMutability": "nonpayable",
+			"type": "function"
+		},
+		{
+			"inputs": [],
+			"name": "valuegoodid",
+			"outputs": [
+				{
+					"internalType": "address",
+					"name": "_valuegoodid",
+					"type": "address"
+				}
+			],
+			"stateMutability": "view",
+			"type": "function"
+		},
+		{
+			"inputs": [
+				{
+					"internalType": "uint256",
+					"name": "amount",
+					"type": "uint256"
+				},
+				{
+					"internalType": "address",
+					"name": "recipent",
+					"type": "address"
+				}
+			],
+			"name": "withdrawPublicSell",
+			"outputs": [],
+			"stateMutability": "nonpayable",
+			"type": "function"
+		}
+	]
+}
