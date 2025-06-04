@@ -461,8 +461,6 @@ library L_Good {
             )
         );
 
-        // Burn the investment proof
-        _investProof.burnProof(disinvestvalue);
 
         // Calculate final profit and fee for main good
         normalGoodResult1_.profit =
@@ -473,17 +471,7 @@ library L_Good {
             normalGoodResult1_.actualDisinvestQuantity
         );
 
-        // Allocate fees for main good
-        allocateFee(
-            _self,
-            normalGoodResult1_.profit,
-            _params._marketconfig,
-            _params._gater,
-            _params._referral,
-            _params._marketcreator,
-            normalGoodResult1_.actualDisinvestQuantity -
-                normalGoodResult1_.actual_fee
-        );
+
 
         // Update fee state for main good if necessary
         if (normalGoodResult1_.actual_fee > 0) {
@@ -573,6 +561,19 @@ library L_Good {
                     valueGoodResult2_.actual_fee
             );
         }
+        // Burn the investment proof
+        _investProof.burnProof(disinvestvalue);
+        // Allocate fees for main good
+        allocateFee(
+            _self,
+            normalGoodResult1_.profit,
+            _params._marketconfig,
+            _params._gater,
+            _params._referral,
+            _params._marketcreator,
+            normalGoodResult1_.actualDisinvestQuantity -
+                normalGoodResult1_.actual_fee
+        );
     }
 
     /**
@@ -664,8 +665,6 @@ library L_Good {
      * @param _fee New configuration value to be applied
      */
     function fillFee(S_GoodState storage _self, uint256 _fee) internal {
-        unchecked {
-            _self.feeQuantityState = _self.feeQuantityState + (_fee << 128);
-        }
+        _self.feeQuantityState = add(_self.feeQuantityState ,toTTSwapUINT256(uint128(_fee),0)); 
     }
 }
