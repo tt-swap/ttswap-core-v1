@@ -166,6 +166,13 @@ library L_TTSwapUINT256Library {
         }
     }
 
+    function amount01(uint256 balanceDelta) internal pure returns (uint128 _amount0, uint128 _amount1) {
+        assembly {
+            _amount0 := shr(128, balanceDelta)
+            _amount1 := balanceDelta
+        }
+    }
+
     /// @notice Calculates amount0 based on a given amount1 and the ratio in balanceDelta
     /// @param balanceDelta The T_BalanceUINT256 containing the ratio
     /// @param amount1delta The amount1 to base the calculation on

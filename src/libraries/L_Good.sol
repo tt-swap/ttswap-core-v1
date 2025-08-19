@@ -72,8 +72,8 @@ library L_Good {
         uint256 _init,
         uint256 _goodConfig
     ) internal {
-        self.currentState = _init;
-        self.investState = _init;
+        self.currentState = toTTSwapUINT256(0,_init.amount1());
+        self.investState = toTTSwapUINT256(_init.amount0(),_init.amount0());
         _goodConfig = (_goodConfig << 33) >> 33;
         _goodConfig = (_goodConfig >> 128) << 128;
         _goodConfig = _goodConfig + (1638416512 << 223); //1638416512 6*2**28+ 1*2**24+ 5*2**21+8*2**16+8*2**11+2*2**6
@@ -197,6 +197,10 @@ library L_Good {
         uint128 constructFeeQuantity; // The construction fee amount (if applicable)
         uint128 actualInvestValue; // The actual value invested after fees
         uint128 actualInvestQuantity; // The actual quantity of goods received for the investment
+        uint128 shares;
+        uint128 values;
+        uint128 investquantity;
+        uint128 currentquantity;
     }
 
     /**
@@ -219,32 +223,19 @@ library L_Good {
         investResult_.actualInvestQuantity =
             _invest -
             investResult_.actualFeeQuantity;
+        
+        (S_GoodInvestReturn.shares,S_GoodInvestReturn.values)=_self.investState.amount01();
+        (S_GoodInvestReturn.investquantity,S_GoodInvestReturn.currentquantity)=_self.currentquantity.amount01();
 
         // Calculate the actual investment value based on the current state
-        investResult_.actualInvestValue = _self
-            .currentState
+        investResult_.actualInvestValue = toTTSwapUINT256(S_GoodInvestReturn.values,S_GoodInvestReturn.currentquantity)
             .getamount0fromamount1(investResult_.actualInvestQuantity);
-
-        // Calculate the construction fee
-        investResult_.constructFeeQuantity = toTTSwapUINT256(
-            _self.feeQuantityState.amount0(),
-            _self.investState.amount1()
-        ).getamount0fromamount1(investResult_.actualInvestQuantity);
-
-        // Update the fee quantity state
-        _self.feeQuantityState = add(
-            _self.feeQuantityState,
-            toTTSwapUINT256(
-                investResult_.actualFeeQuantity +
-                    investResult_.constructFeeQuantity,
-                investResult_.constructFeeQuantity
-            )
-        );
+      
         // Update the current state with the new investment
         _self.currentState = add(
             _self.currentState,
             toTTSwapUINT256(
-                investResult_.actualInvestValue,
+                investResult_.actualInvestQuantity+investResult_.actualFeeQuantity,
                 investResult_.actualInvestQuantity
             )
         );
@@ -252,8 +243,8 @@ library L_Good {
         _self.investState = add(
             _self.investState,
             toTTSwapUINT256(
-                investResult_.actualInvestValue,
-                investResult_.actualInvestQuantity
+                (investResult_.shares,investResult_.values).getamount0fromamount1(investResult_.actualInvestValue),
+                investResult_.actualInvestValue
             )
         );
         _self.goodConfig = add(

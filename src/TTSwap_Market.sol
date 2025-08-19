@@ -170,7 +170,7 @@ contract TTSwap_Market is I_TTSwap_Market, IMulticall_v4 {
             _erc20address,
             address(0),
             toTTSwapUINT256(_initial.amount0(), _initial.amount0()),
-            toTTSwapUINT256(0, _initial.amount1()),
+            toTTSwapUINT256(_initial.amount0(), _initial.amount1()),
             0
         );
         uint128 construct = L_Proof.stake(
