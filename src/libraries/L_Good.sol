@@ -194,7 +194,7 @@ library L_Good {
      */
     struct S_GoodInvestReturn {
         uint128 actualFeeQuantity; // The actual fee amount charged for the investment
-        uint128 constructFeeQuantity; // The construction fee amount (if applicable)
+        uint128 investshare; // The construction fee amount (if applicable)
         uint128 actualInvestValue; // The actual value invested after fees
         uint128 actualInvestQuantity; // The actual quantity of goods received for the investment
         uint128 shares;
@@ -239,11 +239,12 @@ library L_Good {
                 investResult_.actualInvestQuantity
             )
         );
+        investResult_.investShare=(investResult_.shares,investResult_.values).getamount0fromamount1(investResult_.actualInvestValue);
         // Update the invest state with the new investment
         _self.investState = add(
             _self.investState,
             toTTSwapUINT256(
-                (investResult_.shares,investResult_.values).getamount0fromamount1(investResult_.actualInvestValue),
+                investResult_.investShare,
                 investResult_.actualInvestValue
             )
         );

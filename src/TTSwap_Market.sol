@@ -227,10 +227,9 @@ contract TTSwap_Market is I_TTSwap_Market, IMulticall_v4 {
                 investResult.actualInvestValue,
                 investResult.actualInvestValue
             ),
-            _initial.amount0(),
+            toTTSwapUint256(investResult.actualInvestValue,_initial.amount0()),
             toTTSwapUINT256(
-                investResult.constructFeeQuantity,
-                investResult.actualInvestQuantity
+                investResult.investshare,investResult.actualInvestQuantity
             )
         );
 
@@ -405,7 +404,6 @@ contract TTSwap_Market is I_TTSwap_Market, IMulticall_v4 {
             );
         }
     }
-    event debuggswapvalue(uint256);
     /**
      * @dev Simulates a buy order between two goods to check expected amounts
      * @param _goodid1 The address of the input good
@@ -554,18 +552,18 @@ contract TTSwap_Market is I_TTSwap_Market, IMulticall_v4 {
 
         _togood.transferFrom(msg.sender, _quantity, data1);
         _quantity = enpower * _quantity;
+        (normalInvest_.shares,normalInvest_.values)=goods[_togood].investState.amount01();
+        (normalInvest_.investquantity,normalInvest_.currentquantity)=goods[_togood].currentquantity.amount01();
         goods[_togood].investGood(_quantity, normalInvest_, enpower);
 
         if (_valuegood != address(0)) {
             if (goods[_valuegood].goodConfig.isFreeze()) revert TTSwapError(10);
-            valueInvest_.actualInvestQuantity = goods[_valuegood]
-                .currentState
-                .getamount1fromamount0(normalInvest_.actualInvestValue);
-
-            valueInvest_.actualInvestQuantity = goods[_valuegood]
+             (valueInvest_.shares,valueInvest_.values)=goods[_valuegood].investState.amount01();
+             (valueInvest_.investquantity,valueInvest_.currentquantity)=goods[_valuegood].currentquantity.amount01();
+            valueInvest_.actualInvestQuantity = toTTSwapUINT256(valueInvest_.shares,valueInvest_.values).getamount0fromamount1(normalInvest_.actualInvestValue);
+            valueInvest_.actualInvestQuantity=goods[_valuegood]
                 .goodConfig
                 .getInvestFullFee(valueInvest_.actualInvestQuantity);
-
             _valuegood.transferFrom(
                 msg.sender,
                 valueInvest_.actualInvestQuantity,
