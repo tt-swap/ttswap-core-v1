@@ -452,6 +452,8 @@ contract TTSwap_Market is I_TTSwap_Market, IMulticall_v4 {
                 outputQuantity: 0,
                 feeQuantity: 0,
                 swapvalue: 0,
+                good1value:goods[_goodid1].amount1();
+                good2value:goods[_goodid2].amount1();
                 good1currentState: goods[_goodid1].currentState,
                 good1config: goods[_goodid1].goodConfig,
                 good2currentState: goods[_goodid2].currentState,
@@ -552,59 +554,59 @@ contract TTSwap_Market is I_TTSwap_Market, IMulticall_v4 {
 
         _togood.transferFrom(msg.sender, _quantity, data1);
         _quantity = enpower * _quantity;
-        (normalInvest_.shares,normalInvest_.values)=goods[_togood].investState.amount01();
-        (normalInvest_.investquantity,normalInvest_.currentquantity)=goods[_togood].currentquantity.amount01();
+        (normalInvest_.goodShares,normalInvest_.goodValues)=goods[_togood].investState.amount01();
+        (normalInvest_.goodInvestQuantity,normalInvest_.goodCurrentQuantity)=goods[_togood].currentState.amount01();
         goods[_togood].investGood(_quantity, normalInvest_, enpower);
 
         if (_valuegood != address(0)) {
             if (goods[_valuegood].goodConfig.isFreeze()) revert TTSwapError(10);
-             (valueInvest_.shares,valueInvest_.values)=goods[_valuegood].investState.amount01();
-             (valueInvest_.investquantity,valueInvest_.currentquantity)=goods[_valuegood].currentquantity.amount01();
-            valueInvest_.actualInvestQuantity = toTTSwapUINT256(valueInvest_.shares,valueInvest_.values).getamount0fromamount1(normalInvest_.actualInvestValue);
-            valueInvest_.actualInvestQuantity=goods[_valuegood]
+             (valueInvest_.goodShares,valueInvest_.goodValues)=goods[_valuegood].investState.amount01();
+             (valueInvest_.goodInvestQuantity,valueInvest_.goodCurrentQuantity)=goods[_valuegood].currentState.amount01();
+            valueInvest_.investQuantity = toTTSwapUINT256(valueInvest_.goodCurrentQuantity,valueInvest_.goodValues).getamount0fromamount1(normalInvest_.investValue);
+            valueInvest_.investQuantity=goods[_valuegood]
                 .goodConfig
-                .getInvestFullFee(valueInvest_.actualInvestQuantity);
-            _valuegood.transferFrom(
-                msg.sender,
-                valueInvest_.actualInvestQuantity,
-                data2
-            );
+                .getInvestFullFee(valueInvest_.investQuantity);
             goods[_valuegood].investGood(
-                valueInvest_.actualInvestQuantity,
+                valueInvest_.investQuantity,
                 valueInvest_,
                 enpower
+            );
+            _valuegood.transferFrom(
+                msg.sender,
+                valueInvest_.investQuantity/enpower+valueInvest_.investFeeQuantity,
+                data2
             );
         }
 
         uint256 proofNo = S_ProofKey(msg.sender, _togood, _valuegood).toId();
-        uint128 investvalue = normalInvest_.actualInvestValue;
+        uint128 investvalue = normalInvest_.investValue;
 
-        investvalue = (normalInvest_.actualInvestValue / enpower);
+        investvalue = (normalInvest_.investValue / enpower);
         proofs[proofNo].updateInvest(
             _togood,
             _valuegood,
-            toTTSwapUINT256(normalInvest_.actualInvestValue, investvalue),
+            toTTSwapUINT256(normalInvest_.investValue, investvalue),
             toTTSwapUINT256(
-                normalInvest_.constructFeeQuantity,
-                normalInvest_.actualInvestQuantity
+                normalInvest_.investShare,
+                normalInvest_.investQuantity
             ),
             toTTSwapUINT256(
-                valueInvest_.constructFeeQuantity,
-                valueInvest_.actualInvestQuantity
+                valueInvest_.investShare,
+                valueInvest_.investQuantity
             )
         );
         emit e_investGood(
             proofNo,
             _togood,
             _valuegood,
-            toTTSwapUINT256(normalInvest_.actualInvestValue, investvalue),
+            toTTSwapUINT256(normalInvest_.investValue, investvalue),
             toTTSwapUINT256(
-                normalInvest_.actualFeeQuantity,
-                normalInvest_.actualInvestQuantity
+                normalInvest_.investFeeQuantity,
+                normalInvest_.investQuantity
             ),
             toTTSwapUINT256(
-                valueInvest_.actualFeeQuantity,
-                valueInvest_.actualInvestQuantity
+                valueInvest_.investFeeQuantity,
+                valueInvest_.investQuantity
             )
         );
         investvalue = _valuegood == address(0) ? investvalue : investvalue * 2;

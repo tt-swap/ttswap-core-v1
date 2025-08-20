@@ -90,6 +90,8 @@ library L_Good {
         uint128 outputQuantity; // Quantity received from the swap
         uint128 feeQuantity; // Fee amount for the swap
         uint128 swapvalue; // Total value of the swap
+        uint128 good1value;
+        uint128 good2value;
         uint256 good1currentState; // Current state of the first good
         uint256 good1config; // Configuration of the first good
         uint256 good2currentState; // Current state of the second good
@@ -110,8 +112,8 @@ library L_Good {
             _stepCache.remainQuantity -
             _stepCache.feeQuantity;
         uint256 a = uint256(_stepCache.remainQuantity) *
-            uint256(_stepCache.good1currentState.amount0());
-        uint256 b = uint256(_stepCache.good1currentState.amount1()) +
+            uint256(good1value)*2;
+        uint256 b = uint256(_stepCache.good1currentState.amount1())*2 +
             uint256(_stepCache.remainQuantity);
         // Calculate and deduct the sell fee
         _stepCache.swapvalue = toUint128(a / b);
@@ -119,16 +121,16 @@ library L_Good {
             uint256(_stepCache.good2currentState.amount1()) *
             uint256(_stepCache.swapvalue);
         b = uint256(
-            _stepCache.good2currentState.amount0() + _stepCache.swapvalue
+            good2value + _stepCache.swapvalue
         );
         _stepCache.outputQuantity = toUint128(a / b);
-        _stepCache.good1currentState = subadd(
+        _stepCache.good1currentState = add(
             _stepCache.good1currentState,
-            toTTSwapUINT256(_stepCache.swapvalue, _stepCache.remainQuantity)
+            toTTSwapUINT256(_stepCache.remainQuantity+ _stepCache.feeQuantity, _stepCache.remainQuantity)
         );
-        _stepCache.good2currentState = addsub(
+        _stepCache.good2currentState = sub(
             _stepCache.good2currentState,
-            toTTSwapUINT256(_stepCache.swapvalue, _stepCache.outputQuantity)
+            toTTSwapUINT256(_stepCache.outputQuantity, _stepCache.outputQuantity)
         );
     }
 
@@ -178,14 +180,9 @@ library L_Good {
      */
     function swapCommit(
         S_GoodState storage _self,
-        uint256 _swapstate,
-        uint128 _fee
+        uint256 _swapstate
     ) internal {
         _self.currentState = _swapstate;
-        _self.feeQuantityState = add(
-            _self.feeQuantityState,
-            toTTSwapUINT256(_fee, 0)
-        );
     }
 
     /**
@@ -193,14 +190,14 @@ library L_Good {
      * @dev Used to store and return the results of investing in a good
      */
     struct S_GoodInvestReturn {
-        uint128 actualFeeQuantity; // The actual fee amount charged for the investment
-        uint128 investshare; // The construction fee amount (if applicable)
-        uint128 actualInvestValue; // The actual value invested after fees
-        uint128 actualInvestQuantity; // The actual quantity of goods received for the investment
-        uint128 shares;
-        uint128 values;
-        uint128 investquantity;
-        uint128 currentquantity;
+        uint128 investFeeQuantity; // The actual fee amount charged for the investment
+        uint128 investShare; // The construction fee amount (if applicable)
+        uint128 investValue; // The actual value invested after fees
+        uint128 investQuantity; // The actual quantity of goods received for the investment
+        uint128 goodShares;
+        uint128 goodValues;
+        uint128 goodInvestQuantity;
+        uint128 goodCurrentQuantity;
     }
 
     /**
@@ -216,44 +213,42 @@ library L_Good {
         uint128 enpower
     ) internal {
         // Calculate the investment fee
-        investResult_.actualFeeQuantity = _self.goodConfig.getInvestFee(
+        investResult_.investFeeQuantity = _self.goodConfig.getInvestFee(
             _invest
         );
         // Calculate the actual investment quantity after deducting the fee
-        investResult_.actualInvestQuantity =
+        investResult_.investQuantity =
             _invest -
-            investResult_.actualFeeQuantity;
+            investResult_.investFeeQuantity;
         
-        (S_GoodInvestReturn.shares,S_GoodInvestReturn.values)=_self.investState.amount01();
-        (S_GoodInvestReturn.investquantity,S_GoodInvestReturn.currentquantity)=_self.currentquantity.amount01();
 
         // Calculate the actual investment value based on the current state
-        investResult_.actualInvestValue = toTTSwapUINT256(S_GoodInvestReturn.values,S_GoodInvestReturn.currentquantity)
-            .getamount0fromamount1(investResult_.actualInvestQuantity);
+        investResult_.investValue = toTTSwapUINT256(S_GoodInvestReturn.goodValues,S_GoodInvestReturn.goodCurrentQuantity)
+            .getamount0fromamount1(investResult_.investQuantity);
       
         // Update the current state with the new investment
         _self.currentState = add(
             _self.currentState,
             toTTSwapUINT256(
-                investResult_.actualInvestQuantity+investResult_.actualFeeQuantity,
-                investResult_.actualInvestQuantity
+                _invest,
+                investResult_.investQuantity
             )
         );
-        investResult_.investShare=(investResult_.shares,investResult_.values).getamount0fromamount1(investResult_.actualInvestValue);
+        investResult_.investShare=(investResult_.goodShares,investResult_.goodInvestQuantity).getamount0fromamount1(investResult_.investQuantity);
         // Update the invest state with the new investment
         _self.investState = add(
             _self.investState,
             toTTSwapUINT256(
                 investResult_.investShare,
-                investResult_.actualInvestValue
+                investResult_.investValue
             )
         );
         _self.goodConfig = add(
             _self.goodConfig,
             toTTSwapUINT256(
                 0,
-                investResult_.actualInvestQuantity -
-                    investResult_.actualInvestQuantity /
+                investResult_.investQuantity -
+                    investResult_.investQuantity /
                     enpower
             )
         );
@@ -331,13 +326,13 @@ library L_Good {
         // Calculate initial disinvestment results for the main good
         normalGoodResult1_ = S_GoodDisinvestReturn(
             toTTSwapUINT256(
-                _self.feeQuantityState.amount0(),
+                _self.currentState.amount0(),
                 _self.investState.amount1()
             ).getamount0fromamount1(_params._goodQuantity),
             toTTSwapUINT256(
                 _investProof.invest.amount0(),
                 _investProof.invest.amount1()
-            ).getamount0fromamount1(_params._goodQuantity),
+            ).getamount0fromamount1(_params._goodQuantity),  //divest shares
             _params._goodQuantity,
             _investProof.state.getamount1fromamount0(_params._goodQuantity)
         );
@@ -346,7 +341,7 @@ library L_Good {
         _self.currentState = sub(
             _self.currentState,
             toTTSwapUINT256(
-                disinvestvalue.amount1(),
+                normalGoodResult1_.vitualDisinvestQuantity,
                 normalGoodResult1_.vitualDisinvestQuantity
             )
         );
@@ -355,15 +350,7 @@ library L_Good {
             _self.investState,
             toTTSwapUINT256(
                 disinvestvalue.amount1(),
-                normalGoodResult1_.vitualDisinvestQuantity
-            )
-        );
-
-        _self.feeQuantityState = sub(
-            _self.feeQuantityState,
-            toTTSwapUINT256(
-                normalGoodResult1_.profit,
-                normalGoodResult1_.actual_fee
+                disinvestvalue.amount1()
             )
         );
 
@@ -449,15 +436,6 @@ library L_Good {
                 )
             );
 
-            _valueGoodState.feeQuantityState = sub(
-                _valueGoodState.feeQuantityState,
-                toTTSwapUINT256(
-                    valueGoodResult2_.profit,
-                    valueGoodResult2_.actual_fee
-                )
-            );
-
-        
              _valueGoodState.goodConfig=sub(_valueGoodState.goodConfig,disinvestvalue.amount1()-actualvalue);
 
         
