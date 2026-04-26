@@ -68,6 +68,9 @@ TTSwapError(uint256) 0xd1b51911
 70:执行失败,公售数量超过目标值
 71:执行失败,没有二次质押权限
 72:执行失败,签名已经失效
+73:执行失败,解锁比例为0
+74:执行失败,未解锁数量为0
+75:执行失败,解锁上销过大
 NativeETHTransferFailed()          6c0f429e   nativeETH转账失败
 ERC20TransferFailed()              f27f64e4   代币转账失败
 ERC20PermitFailed()                40754b6a   代币转账失败
