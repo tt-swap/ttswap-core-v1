@@ -236,8 +236,8 @@ contract TTSwap_Token is I_TTSwap_Token, ERC20, IEIP712 {
             user != referral
         ) {
             userConfig[user] = userConfig[user].setReferral(referral);
+            emit e_addreferral(user, referral);
         }
-        emit e_addreferral(user, referral);
     }
 
     /**
@@ -497,12 +497,12 @@ contract TTSwap_Token is I_TTSwap_Token, ERC20, IEIP712 {
      */
     function _stakeFee() internal {
         if (stakestate.amount0() + 86400 < block.timestamp) {
-            stakestate = add(stakestate, toTTSwapUINT256(86400, 0));
+            stakestate =  toTTSwapUINT256(uint128(block.timestamp), stakestate.amount1());
             uint128 leftamount = 200_000_000_000_000_000_000 > totalSupply
                 ? uint128(200_000_000_000_000_000_000 - totalSupply)
                 : 0;
-            uint128 mintamount = leftamount < 1000000000000
-                ? 1000000
+            uint128 mintamount = leftamount < 1000000000000 
+                ? 1000000000000
                 : leftamount / 18250; //leftamount /50 /365
             poolstate = add(
                 poolstate,
@@ -512,7 +512,6 @@ contract TTSwap_Token is I_TTSwap_Token, ERC20, IEIP712 {
                 toTTSwapUINT256(stakestate.amount0(), poolstate.amount0())
             );
         }
-
     }
     // burn
     /**
@@ -607,7 +606,6 @@ contract TTSwap_Token is I_TTSwap_Token, ERC20, IEIP712 {
                 )
             );
     }
-
 
     /// @notice Creates an EIP-712 typed data hash
     function _hashTypedData(bytes32 dataHash) internal view returns (bytes32) {
